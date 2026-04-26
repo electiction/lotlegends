@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Lot Legends — Quiet Luxury for Traders</title>
+  <meta name="description" content="The Lot Legends — โปรแกรมสะสม Lot สำหรับเทรดเดอร์ XM แลกของรางวัลระดับพรีเมียม เรียบหรู คลาสสิก ไม่ตะโกน" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ───────────── LOADING ───────────── -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__mark">
+      <svg viewBox="0 0 60 60" width="56" height="56" aria-hidden="true">
+        <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+      </svg>
+      <span class="loader__letter">L</span>
+    </div>
+    <span class="loader__text">The Lot Legends</span>
+  </div>
+
+  <!-- ───────────── NAV ───────────── -->
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="brand">
+        <span class="brand__mark">L</span>
+        <span class="brand__text">The Lot Legends</span>
+      </a>
+      <nav class="nav__links">
+        <a href="#tiers">Rewards</a>
+        <a href="#how">How it works</a>
+        <a href="#leaderboard">Leaderboard</a>
+        <a href="#faq">FAQ</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="login.html">เข้าสู่ระบบ</a>
+      </nav>
+      <a href="join.html" class="btn btn--ghost btn--nav">เข้าร่วม</a>
+
+      <button class="nav__burger" id="nav-burger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile drawer -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <nav class="drawer__links">
+      <a href="#tiers">Rewards</a>
+      <a href="#how">How it works</a>
+      <a href="#leaderboard">Leaderboard</a>
+      <a href="#faq">FAQ</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="login.html">เข้าสู่ระบบ</a>
+      <a href="join.html" class="drawer__cta">เข้าร่วมโปรแกรม</a>
+    </nav>
+    <p class="drawer__footer muted small">Quiet Luxury for Traders</p>
+  </div>
+
+  <!-- ───────────── HERO ───────────── -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__veil" aria-hidden="true"></div>
+
+    <div class="hero__inner">
+      <p class="eyebrow">A Private Rewards Program · Est. 2026</p>
+      <h1 class="hero__title">
+        The Lot <em>Legends</em>
+      </h1>
+      <p class="hero__sub">
+        เทรดในแบบของคุณ สะสมในจังหวะของคุณ<br/>
+        แล้วปล่อยให้รางวัลเดินทางมาหาในแบบที่เงียบและงดงาม
+      </p>
+
+      <div class="hero__cta">
+        <a href="#tiers" class="btn btn--gold">ดูระดับรางวัล</a>
+        <a href="join.html" class="btn btn--ghost">เริ่มต้นใช้งาน</a>
+      </div>
+
+      <div class="hero__meta">
+        <div><span class="num">8</span><span class="lbl">Tiers</span></div>
+        <div class="vr"></div>
+        <div><span class="num">1,000</span><span class="lbl">Lots Max</span></div>
+        <div class="vr"></div>
+        <div><span class="num">∞</span><span class="lbl">Possibilities</span></div>
+      </div>
+    </div>
+
+    <div class="hero__scroll" aria-hidden="true">
+      <span></span>
+      <small>scroll</small>
+    </div>
+  </section>
+
+  <!-- ───────────── ABOUT ───────────── -->
+  <section class="about" id="about">
+    <div class="container two-col">
+      <div>
+        <p class="eyebrow">— The Idea</p>
+        <h2 class="h2">เทรดเดอร์ที่จริงจัง<br/>สมควรได้รับรางวัลที่ <em>เงียบงาม</em></h2>
+      </div>
+      <div class="about__body">
+        <p>
+          The Lot Legends คือโปรแกรมสะสม Lot สำหรับเทรดเดอร์ XM
+          ที่เชื่อว่าความสำเร็จไม่จำเป็นต้องส่งเสียงดัง
+          เราคัดสรรของรางวัลทุกชิ้นจากแบรนด์ที่ผ่านการพิสูจน์ด้วยกาลเวลา
+          เพราะของที่ดี ไม่ต้องอวด ก็รู้ว่าดี
+        </p>
+        <p class="muted">
+          ทุก Lot ที่คุณเทรด ถูกบันทึกอย่างโปร่งใส
+          เปลี่ยนเป็นรางวัลที่จับต้องได้จริง — โดยไม่มีเงื่อนไขซ่อนเร้น
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── TIERS ───────────── -->
+  <section class="tiers" id="tiers">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">— The Ladder</p>
+        <h2 class="h2">แปดระดับ. <em>หนึ่งเส้นทาง.</em></h2>
+        <p class="muted center">
+          ออกแบบให้ทุกขั้นเป็นไปได้จริง — ตั้งแต่มือใหม่ จนถึงตำนาน
+        </p>
+      </div>
+
+      <ol class="tier-list">
+        <li class="tier" data-tier="starter">
+          <div class="tier__rank">01</div>
+          <div class="tier__body">
+            <div class="tier__head">
+              <h3>Starter</h3>
+              <span class="tier__lots">10 Lots</span>
+            </div>
+            <p>เสื้อยืด · หมวก · สติกเกอร์เซต ของขวัญแรกแห่งการเดินทาง</p>
+          </div>
+          <div class="tier__value">฿300–500</div>
+        </li>
+
+        <li class="tier" data-tier="bronze">
+          <div class="tier__rank">02</div>
+          <div class="tier__body">
+            <div class="tier__head">
+              <h3>Bronze</h3>
+              <span class="tier__lots">30 Lots</span>
+            </div>
+            <p>กระเป๋าเป้คุณภาพดี หรือ Power Bank 10,000mAh</p>
+          </div>
+          <div class="tier__value">฿800–1,200</div>
+        </li>
+
+        <li class="tier" data-tier="silver">
+          <div class="tier__rank">03</div>
+          <div class="tier__body">
+            <div class="tier__head">
+              <h3>Silver</h3>
+              <span class="tier__lots">70 Lots</span>
+            </div>
+            <p>หูฟังบลูทูธคุณภาพ — Soundcore, JBL หรือเทียบเท่า</p>
+          </div>
+          <div class="tier__value">฿1,500–2,500</div>
+        </li>
+
+        <li class="tier" data-tier="gold">
+          <div class="tier__rank">04</div>
+          <div class="tier__body">
+            <div class="tier__head">
+              <h3>Gold</h3>
+              <span class="tier__lots">150 Lots</span>
+            </div>
+            <p>Apple Watch SE หรือ Galaxy Watch — เพื่อนคู่กายของเทรดเดอร์</p>
+          </div>
+          <div class="tier__value">฿8,000–10,000</div>
+        </li>
+
+        <li class="tier tier--featured" data-tier="platinum">
+          <div class="tier__rank">05</div>
+          <div class="tier__body">
+            <div class="tier__head">
+              <h3>Platinum</h3>
+              <span class="tier__lots">300 Lots</span>
+            </div>
+            <p>iPad (Gen 10) หรือ AirPods Pro 2 — ก้าวสู่ระดับมืออาชีพ</p>
+          </div>
+          <div class="tier__value">฿15,000–20,000</div>
+        </li>
+
+        <li class="tier tier--featured" data-tier="diamond">
+          <div class="tier__rank">06</div>
+          <div class="tier__body">
+            <div class="tier__head">
+              <h3>Diamond</h3>
+              <span class="tier__lots">500 Lots</span>
+            </div>
+            <p>MacBook Air M3 หรือ iPhone 16 — เครื่องมือของผู้สร้างความฝัน</p>
+          </div>
+          <div class="tier__value">฿35,000–45,000</div>
+        </li>
+
+        <li class="tier tier--master" data-tier="master">
+          <div class="tier__rank">07</div>
+          <div class="tier__body">
+            <div class="tier__head">
+              <h3>Master</h3>
+              <span class="tier__lots">700 Lots</span>
+            </div>
+            <p>iPhone 17 Pro Max — สัญลักษณ์ของผู้พิชิตตลาด</p>
+          </div>
+          <div class="tier__value">฿55,000</div>
+        </li>
+
+        <li class="tier tier--legend" data-tier="legend">
+          <div class="tier__rank">08</div>
+          <div class="tier__body">
+            <div class="tier__head">
+              <h3>Legend</h3>
+              <span class="tier__lots">1,000 Lots</span>
+            </div>
+            <p>ทองคำหนัก 1 บาท หรือ Trip ต่างประเทศ — ตำนานเริ่มต้นที่นี่</p>
+          </div>
+          <div class="tier__value">฿60,000+</div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ───────────── FEATURED CARDS ───────────── -->
+  <section class="featured">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">— Featured Rewards</p>
+        <h2 class="h2">ของบางชิ้น <em>ไม่ต้องอธิบาย</em></h2>
+      </div>
+
+      <div class="cards">
+        <article class="card">
+          <div class="card__img">
+            <img src="assets/tier-iphone.png" alt="iPhone 17 Pro Max" loading="lazy" />
+          </div>
+          <div class="card__body">
+            <p class="card__tier">Master · 700 Lots</p>
+            <h3>iPhone 17 Pro Max</h3>
+            <p class="muted">
+              ไทเทเนียมขัดมือ จอ ProMotion 120Hz กล้องระดับโปร
+              และพลังประมวลผลที่ออกแบบมาเพื่อผู้นำ
+            </p>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__img">
+            <img src="assets/tier-macbook.png" alt="MacBook Air M3" loading="lazy" />
+          </div>
+          <div class="card__body">
+            <p class="card__tier">Diamond · 500 Lots</p>
+            <h3>MacBook Air M3</h3>
+            <p class="muted">
+              บางเบา เงียบสงบ พลังเหลือเฟือ
+              เครื่องมือคู่ใจสำหรับวิเคราะห์กราฟทุกที่ทุกเวลา
+            </p>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__img">
+            <img src="assets/tier-gold.png" alt="ทองคำ 1 บาท" loading="lazy" />
+          </div>
+          <div class="card__body">
+            <p class="card__tier">Legend · 1,000 Lots</p>
+            <h3>ทองคำ 1 บาท</h3>
+            <p class="muted">
+              ของจริง ที่ไม่มีวันหมดอายุ
+              รางวัลคลาสสิกสำหรับผู้พิชิตตำแหน่งสูงสุด
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── HOW IT WORKS ───────────── -->
+  <section class="how" id="how">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">— How It Works</p>
+        <h2 class="h2">สี่ขั้น. <em>ง่ายอย่างที่ควรเป็น.</em></h2>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <span class="steps__num">01</span>
+          <h4>สมัครภายใต้ IB ของเรา</h4>
+          <p>คลิกลิงก์เพื่อเปิดบัญชี XM ใหม่ภายใต้ Partner Code ของเรา ใช้เวลาไม่ถึง 5 นาที</p>
+        </li>
+        <li>
+          <span class="steps__num">02</span>
+          <h4>เทรดในแบบของคุณ</h4>
+          <p>ทุก Lot ที่คุณเทรด (ไม่ว่า Forex, Gold, Index) จะถูกบันทึกอัตโนมัติ</p>
+        </li>
+        <li>
+          <span class="steps__num">03</span>
+          <h4>ตรวจสอบความคืบหน้า</h4>
+          <p>ดู Dashboard ส่วนตัวได้ตลอดเวลา — โปร่งใส ไม่มีเงื่อนไขแอบแฝง</p>
+        </li>
+        <li>
+          <span class="steps__num">04</span>
+          <h4>รับรางวัลถึงบ้าน</h4>
+          <p>เมื่อถึงระดับที่ต้องการ ทักมาแจ้งเลือกรางวัล จัดส่งฟรีทั่วไทย</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ───────────── LEADERBOARD ───────────── -->
+  <section class="leaderboard" id="leaderboard">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">— Hall of Legends</p>
+        <h2 class="h2">ตำนานประจำเดือน</h2>
+        <p class="muted center">อัปเดตทุกวันที่ 1 ของเดือน · ปกปิดตัวตนเพื่อความเป็นส่วนตัว</p>
+      </div>
+
+      <div class="board" id="leaderboard-board">
+        <div class="board__row board__row--head">
+          <span>Rank</span>
+          <span>Trader</span>
+          <span>Tier</span>
+          <span class="num-col">Lots</span>
+        </div>
+        <div class="board__row board__row--placeholder">
+          <span class="muted small" style="grid-column:1/-1;text-align:center;padding:18px 0;">กำลังโหลด leaderboard…</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── FAQ ───────────── -->
+  <section class="faq" id="faq">
+    <div class="container two-col">
+      <div>
+        <p class="eyebrow">— Questions</p>
+        <h2 class="h2">คำถาม<br/><em>ที่พบบ่อย</em></h2>
+      </div>
+
+      <div class="faq__list">
+        <details>
+          <summary>ต้องเทรดประเภทไหนถึงจะนับ Lot?</summary>
+          <p>นับทุก Instrument ที่ XM เปิดเทรด — Forex, Gold, Crypto, Index, Stocks ตามมาตรฐาน Standard Lot ของ XM</p>
+        </details>
+        <details>
+          <summary>Lot ที่สะสมไว้หมดอายุไหม?</summary>
+          <p>ไม่หมดอายุ คุณสะสมในจังหวะของคุณเอง ไม่ต้องเร่งรีบ ไม่ตะโกนเรียกร้อง</p>
+        </details>
+        <details>
+          <summary>เคยมีบัญชี XM อยู่แล้ว เข้าร่วมได้ไหม?</summary>
+          <p>หากยังไม่ได้อยู่ใต้ IB ของเรา ต้องเปิดบัญชีใหม่ภายใต้ Partner Code เพื่อให้ระบบนับ Lot ได้ถูกต้อง</p>
+        </details>
+        <details>
+          <summary>รางวัลส่งทั่วประเทศไหม?</summary>
+          <p>ส่งฟรีทั่วประเทศไทยผ่าน Kerry / Flash Express พร้อมประกันสินค้า 100%</p>
+        </details>
+        <details>
+          <summary>เลือกของรางวัลแทนได้ไหม?</summary>
+          <p>ได้ในมูลค่าเทียบเท่า เช่น แทน iPhone ด้วย iPad หรือทอง สามารถพูดคุยกับทีมได้</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── FINAL CTA ───────────── -->
+  <section class="cta" id="join">
+    <div class="container cta__inner">
+      <p class="eyebrow">— Begin Your Legend</p>
+      <h2 class="h2 cta__title">
+        เริ่มต้นเส้นทาง<br/><em>ในแบบของคุณ</em>
+      </h2>
+      <p class="muted">เปิดบัญชี XM ภายใต้ Partner Code ของเรา และเริ่มสะสมตั้งแต่ Lot แรก</p>
+      <div class="cta__buttons">
+        <a href="join.html" class="btn btn--gold btn--lg">เปิดบัญชี XM</a>
+        <a href="#" class="btn btn--ghost btn--lg">ติดต่อทีมงาน</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── FOOTER ───────────── -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <a href="#" class="brand">
+          <span class="brand__mark">L</span>
+          <span class="brand__text">The Lot Legends</span>
+        </a>
+        <p class="muted small">Quiet Luxury for Traders. Est. 2026</p>
+      </div>
+      <div class="footer__cols">
+        <div>
+          <h5>Program</h5>
+          <a href="#tiers">Rewards</a>
+          <a href="#how">How it works</a>
+          <a href="#leaderboard">Leaderboard</a>
+        </div>
+        <div>
+          <h5>Contact</h5>
+          <a href="#">Line Official</a>
+          <a href="#">Facebook</a>
+          <a href="#">Email</a>
+        </div>
+        <div>
+          <h5>Legal</h5>
+          <a href="#">Terms</a>
+          <a href="#">Privacy</a>
+          <a href="#">Risk Disclosure</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer__bottom">
+      <small>© 2026 The Lot Legends. Trading involves risk. Past performance does not guarantee future results.</small>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="script.js"></script>
+  <script>
+    (async () => {
+      const board = document.getElementById('leaderboard-board');
+      if (!board) return;
+      try {
+        const rows = await window.LotLegends.leaderboard(8);
+        board.querySelectorAll('.board__row:not(.board__row--head)').forEach(r => r.remove());
+        if (!rows.length) {
+          board.insertAdjacentHTML('beforeend', `
+            <div class="board__row"><span class="muted small" style="grid-column:1/-1;text-align:center;padding:18px 0;">
+              ยังไม่มีตำนาน · เป็นคนแรกที่สะสม Lot สิ
+            </span></div>`);
+          return;
+        }
+        const rankClass = (i) => i === 1 ? 'gold' : i === 2 ? 'silver' : i === 3 ? 'bronze' : '';
+        rows.forEach(r => {
+          board.insertAdjacentHTML('beforeend', `
+            <div class="board__row">
+              <span class="rank ${rankClass(r.rank)}">${String(r.rank).padStart(2, '0')}</span>
+              <span>${r.handle}</span>
+              <span><i class="dot dot--${r.tier_key}"></i> ${r.tier_name}</span>
+              <span class="num-col">${(r.total_lots).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
+            </div>`);
+        });
+      } catch (e) {
+        console.warn('leaderboard fetch failed', e);
+      }
+    })();
+  </script>
+</body>
+</html>

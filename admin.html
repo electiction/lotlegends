@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · The Lot Legends</title>
+  <meta name="description" content="ผู้ดูแลระบบ — อัปโหลดข้อมูลจาก XM Partner CSV และตรวจสอบสมาชิก" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page--app">
+
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__mark">
+      <svg viewBox="0 0 60 60" width="56" height="56" aria-hidden="true">
+        <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+      </svg>
+      <span class="loader__letter">L</span>
+    </div>
+    <span class="loader__text">Loading admin console</span>
+  </div>
+
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="brand">
+        <span class="brand__mark">L</span>
+        <span class="brand__text">The Lot Legends</span>
+      </a>
+      <nav class="nav__links">
+        <a href="index.html#tiers">Rewards</a>
+        <a href="index.html#leaderboard">Leaderboard</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="admin.html" class="is-active">Admin</a>
+      </nav>
+      <button type="button" class="btn btn--ghost btn--nav" id="logout-btn">ออกจากระบบ</button>
+      <button class="nav__burger" id="nav-burger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <nav class="drawer__links">
+      <a href="index.html#tiers">Rewards</a>
+      <a href="index.html#leaderboard">Leaderboard</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+    <p class="drawer__footer muted small">Admin Console</p>
+  </div>
+
+  <section class="app-head">
+    <div class="container">
+      <p class="eyebrow">— Admin Console</p>
+      <div class="app-head__row">
+        <div>
+          <h1 class="h2">นำเข้าข้อมูลจาก <em>XM Partner</em></h1>
+          <p class="muted">อัปโหลดไฟล์ <code>traderTrades.csv</code> ที่ดาวน์โหลดจาก XM Partner Portal เพื่ออัปเดต Lots ของสมาชิกอัตโนมัติ</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-section">
+    <div class="container">
+      <div class="card-panel">
+        <div class="panel__head">
+          <p class="eyebrow">— Step 1 / 2</p>
+          <h3 class="panel__title">อัปโหลดไฟล์ &amp; ตรวจสอบ</h3>
+        </div>
+
+        <div class="dropzone" id="dropzone" tabindex="0">
+          <input type="file" id="file-input" accept=".csv,text/csv" hidden />
+          <div class="dropzone__inner">
+            <div class="dropzone__icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M12 4v12m0 0l-4-4m4 4l4-4"/>
+                <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+              </svg>
+            </div>
+            <p class="dropzone__title">ลากไฟล์ CSV มาวาง หรือคลิกเพื่อเลือก</p>
+            <p class="muted small">รองรับไฟล์ <code>traderTrades.csv</code> · UTF-8 / Windows-874</p>
+            <button type="button" class="btn btn--ghost btn--sm" id="browse-btn">เลือกไฟล์</button>
+          </div>
+        </div>
+
+        <p class="form__error" id="upload-error" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-section" id="preview-section" hidden>
+    <div class="container">
+      <div class="card-panel">
+        <div class="panel__head">
+          <p class="eyebrow">— Preview · Dry Run</p>
+          <h3 class="panel__title" id="preview-title">ตรวจสอบก่อนนำเข้า</h3>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <p class="stat__label">รายการทั้งหมด</p>
+            <p class="stat__value"><span id="pv-total">0</span></p>
+            <p class="stat__sub"><span id="pv-period">—</span></p>
+          </div>
+          <div class="stat">
+            <p class="stat__label">รายการใหม่</p>
+            <p class="stat__value"><span id="pv-new">0</span></p>
+            <p class="stat__sub"><span id="pv-dup">0</span> ซ้ำ (ข้าม)</p>
+          </div>
+          <div class="stat">
+            <p class="stat__label">Lots ที่จะเพิ่ม</p>
+            <p class="stat__value">+<span id="pv-lots">0</span></p>
+            <p class="stat__sub">รวมในไฟล์ <span id="pv-total-lots">0</span> Lots</p>
+          </div>
+          <div class="stat">
+            <p class="stat__label">สมาชิกที่ตรง</p>
+            <p class="stat__value"><span id="pv-matched">0</span></p>
+            <p class="stat__sub"><span id="pv-unmatched">0</span> MT ID ไม่ตรง</p>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>MT4/MT5 ID</th>
+                <th>สมาชิก</th>
+                <th class="num">รายการในไฟล์</th>
+                <th class="num">รายการใหม่</th>
+                <th class="num">Lots ใหม่</th>
+                <th>สถานะ</th>
+              </tr>
+            </thead>
+            <tbody id="pv-rows">
+              <tr><td colspan="6" class="muted small" style="text-align:center;padding:24px 0;">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="pv-unmatched-box" hidden class="callout callout--warn">
+          <strong>MT IDs ที่ยังไม่มีสมาชิกในระบบ:</strong>
+          <p class="muted small" id="pv-unmatched-list">—</p>
+          <div class="callout__actions">
+            <button type="button" class="btn btn--gold btn--sm" id="create-placeholders-btn">
+              สร้างบัญชี Placeholder ทั้งหมด
+            </button>
+            <span class="muted small">— สร้าง user 1 บัญชีต่อ MT ID แล้วตรวจสอบใหม่อัตโนมัติ</span>
+          </div>
+          <p class="muted small" style="margin-top:10px;">
+            หรือเลื่อนไปตาราง <strong>"สมาชิกทั้งหมด"</strong> ด้านล่าง → คลิก MT ID ของ user ที่มีอยู่ → ใส่เลขจาก CSV เพื่อ "ผูก" บัญชีจริงเข้ากับลูกค้าที่เคยลงทะเบียนแล้ว
+          </p>
+          <p class="form__error" id="placeholder-error" hidden style="margin-top:8px;"></p>
+        </div>
+
+        <div id="pv-errors-box" hidden class="callout">
+          <strong>คำเตือนการ parse:</strong>
+          <ul id="pv-errors-list" class="muted small"></ul>
+        </div>
+
+        <div class="form__actions">
+          <button type="button" class="btn btn--ghost" id="cancel-btn">ยกเลิก</button>
+          <button type="button" class="btn btn--gold" id="confirm-btn">ยืนยันนำเข้า</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-section">
+    <div class="container">
+      <div class="card-panel">
+        <div class="panel__head">
+          <div>
+            <p class="eyebrow">— History</p>
+            <h3 class="panel__title">ประวัติการนำเข้า</h3>
+          </div>
+          <button type="button" class="btn btn--ghost btn--sm" id="refresh-history">รีเฟรช</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>วันที่</th>
+                <th>ไฟล์</th>
+                <th class="num">รายการ</th>
+                <th class="num">นำเข้า</th>
+                <th class="num">ซ้ำ</th>
+                <th class="num">ไม่ตรง</th>
+                <th class="num">+Lots</th>
+              </tr>
+            </thead>
+            <tbody id="history-rows">
+              <tr><td colspan="7" class="muted small" style="text-align:center;padding:24px 0;">กำลังโหลด…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="app-section">
+    <div class="container">
+      <div class="card-panel">
+        <div class="panel__head">
+          <div>
+            <p class="eyebrow">— Members</p>
+            <h3 class="panel__title">สมาชิกทั้งหมด</h3>
+          </div>
+          <button type="button" class="btn btn--ghost btn--sm" id="refresh-users">รีเฟรช</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ชื่อ</th>
+                <th>อีเมล</th>
+                <th>MT ID</th>
+                <th>Handle</th>
+                <th class="num">Lots สะสม</th>
+                <th>สิทธิ์</th>
+              </tr>
+            </thead>
+            <tbody id="user-rows">
+              <tr><td colspan="6" class="muted small" style="text-align:center;padding:24px 0;">กำลังโหลด…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__bottom">
+      <small>© 2026 The Lot Legends · Admin Console</small>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="script.js"></script>
+  <script>
+    (() => {
+      if (!window.LotLegends.requireAuth()) return;
+
+      const $ = (id) => document.getElementById(id);
+      const fmt = (n, d = 2) => (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+      const fmtInt = (n) => (Number(n) || 0).toLocaleString('en-US');
+
+      $('logout-btn').addEventListener('click', () => window.LotLegends.logout());
+
+      let currentFile = null;
+
+      window.LotLegends.me().then(u => {
+        if (!u.is_admin) {
+          alert('หน้านี้สำหรับผู้ดูแลระบบเท่านั้น');
+          window.location.href = 'dashboard.html';
+        }
+      }).catch(() => window.LotLegends.logout());
+
+      // ─── Drag & drop upload ─────────────────────────────────────
+      const dz = $('dropzone');
+      const fi = $('file-input');
+      const errBox = $('upload-error');
+
+      const showError = (msg) => { errBox.textContent = msg; errBox.hidden = false; };
+      const clearError = () => { errBox.hidden = true; errBox.textContent = ''; };
+
+      $('browse-btn').addEventListener('click', () => fi.click());
+      dz.addEventListener('click', (e) => {
+        if (e.target.closest('button')) return;
+        fi.click();
+      });
+      dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fi.click(); } });
+
+      ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, (e) => {
+        e.preventDefault(); dz.classList.add('is-drag');
+      }));
+      ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, (e) => {
+        e.preventDefault(); dz.classList.remove('is-drag');
+      }));
+      dz.addEventListener('drop', (e) => {
+        const f = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f) handleFile(f);
+      });
+      fi.addEventListener('change', () => {
+        if (fi.files && fi.files[0]) handleFile(fi.files[0]);
+      });
+
+      async function handleFile(file) {
+        clearError();
+        if (!/\.csv$/i.test(file.name)) {
+          showError('รองรับเฉพาะไฟล์ .csv เท่านั้น');
+          return;
+        }
+        currentFile = file;
+        $('preview-title').textContent = `ตรวจสอบก่อนนำเข้า · ${file.name}`;
+        $('preview-section').hidden = false;
+        $('confirm-btn').disabled = true;
+        $('confirm-btn').textContent = 'กำลังตรวจสอบ…';
+
+        try {
+          const preview = await window.LotLegends.adminPreviewCsv(file);
+          renderPreview(preview);
+          $('confirm-btn').disabled = preview.new_rows === 0;
+          if (preview.new_rows === 0) {
+            $('confirm-btn').textContent = 'ไม่มีรายการใหม่';
+          } else if (preview.already_imported) {
+            $('confirm-btn').textContent = 'อัปโหลดซ้ำ — เก็บเฉพาะรายการที่ยังขาด';
+          } else {
+            $('confirm-btn').textContent = 'ยืนยันนำเข้า';
+          }
+        } catch (ex) {
+          $('preview-section').hidden = true;
+          let msg = ex.message || 'อ่านไฟล์ไม่สำเร็จ';
+          if (ex.data && ex.data.detail && typeof ex.data.detail === 'object') {
+            msg = ex.data.detail.message || msg;
+            if (Array.isArray(ex.data.detail.errors) && ex.data.detail.errors[0]) {
+              msg += ' · ' + (ex.data.detail.errors[0].error || '');
+            }
+          }
+          showError(msg);
+        }
+      }
+
+      function renderPreview(p) {
+        $('pv-total').textContent     = fmtInt(p.total_rows);
+        $('pv-new').textContent       = fmtInt(p.new_rows);
+        $('pv-dup').textContent       = fmtInt(p.duplicate_rows);
+        $('pv-lots').textContent      = fmt(p.new_lots_to_add);
+        $('pv-total-lots').textContent= fmt(p.total_lots_in_file);
+        $('pv-matched').textContent   = fmtInt(p.matched_users);
+        $('pv-unmatched').textContent = fmtInt(p.unmatched_mt_ids.length);
+
+        if (p.period_start && p.period_end) {
+          const a = new Date(p.period_start), b = new Date(p.period_end);
+          const f = (d) => d.toLocaleDateString('th-TH', { day:'2-digit', month:'2-digit', year:'numeric' });
+          $('pv-period').textContent = `${f(a)} – ${f(b)}`;
+        } else {
+          $('pv-period').textContent = '—';
+        }
+
+        const rows = p.by_mt_id.map(r => `
+          <tr>
+            <td><code>${r.mt_id}</code></td>
+            <td>${r.matched ? `${escapeHtml(r.user_name || '')}<br><small class="muted">${escapeHtml(r.user_email || '')}</small>` : '<span class="muted">—</span>'}</td>
+            <td class="num">${fmtInt(r.trade_count)}</td>
+            <td class="num">${fmtInt(r.new_trade_count)}</td>
+            <td class="num">+${fmt(r.new_lots_sum)}</td>
+            <td>${r.matched ? '<span class="pill pill--ok">ตรง</span>' : '<span class="pill pill--warn">ไม่พบสมาชิก</span>'}</td>
+          </tr>
+        `).join('');
+        $('pv-rows').innerHTML = rows || '<tr><td colspan="6" class="muted small" style="text-align:center;padding:24px 0;">ไม่มีข้อมูล</td></tr>';
+
+        if (p.unmatched_mt_ids.length) {
+          $('pv-unmatched-box').hidden = false;
+          $('pv-unmatched-list').textContent = p.unmatched_mt_ids.join(', ');
+        } else {
+          $('pv-unmatched-box').hidden = true;
+        }
+
+        if (p.sample_errors && p.sample_errors.length) {
+          $('pv-errors-box').hidden = false;
+          $('pv-errors-list').innerHTML = p.sample_errors
+            .map(e => `<li>row ${e.row}: ${escapeHtml(String(e.error || ''))}</li>`).join('');
+        } else {
+          $('pv-errors-box').hidden = true;
+        }
+
+        if (p.already_imported) {
+          clearError();
+        }
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      }
+
+      $('cancel-btn').addEventListener('click', () => {
+        currentFile = null;
+        fi.value = '';
+        $('preview-section').hidden = true;
+        clearError();
+      });
+
+      $('create-placeholders-btn').addEventListener('click', async () => {
+        const list = ($('pv-unmatched-list').textContent || '').trim();
+        if (!list) return;
+        const mtIds = list.split(/[,\s]+/).filter(Boolean);
+        if (!mtIds.length) return;
+
+        const btn = $('create-placeholders-btn');
+        const errBox = $('placeholder-error');
+        errBox.hidden = true;
+        const orig = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = `กำลังสร้าง ${mtIds.length} บัญชี…`;
+
+        try {
+          const result = await window.LotLegends.adminCreatePlaceholders(mtIds);
+          await loadUsers();
+          if (currentFile) {
+            const refreshed = await window.LotLegends.adminPreviewCsv(currentFile);
+            renderPreview(refreshed);
+            $('confirm-btn').disabled = refreshed.new_rows === 0;
+            $('confirm-btn').textContent = refreshed.new_rows === 0
+              ? 'ไม่มีรายการใหม่'
+              : 'ยืนยันนำเข้า';
+          }
+          alert(`สร้าง ${result.created.length} บัญชีเรียบร้อย${result.skipped.length ? ` (ข้าม ${result.skipped.length} ที่ใช้แล้ว)` : ''}\n\nกด "ยืนยันนำเข้า" ได้เลย`);
+        } catch (ex) {
+          errBox.textContent = ex.message || 'สร้างบัญชีไม่สำเร็จ';
+          errBox.hidden = false;
+        } finally {
+          btn.disabled = false;
+          btn.textContent = orig;
+        }
+      });
+
+      $('confirm-btn').addEventListener('click', async () => {
+        if (!currentFile) return;
+        $('confirm-btn').disabled = true;
+        $('confirm-btn').textContent = 'กำลังนำเข้า…';
+        try {
+          const result = await window.LotLegends.adminImportCsv(currentFile);
+          let msg;
+          if (result.imported_rows > 0) {
+            msg = `นำเข้าสำเร็จ · เพิ่ม ${result.imported_rows} รายการ · +${fmt(result.total_lots_added)} Lots ให้ ${result.matched_users} สมาชิก`;
+            if (result.unmatched_rows > 0) {
+              msg += `\n\n(ข้าม ${result.unmatched_rows} รายการ เพราะ MT ID ไม่ตรงกับสมาชิก — ดูตาราง "สมาชิกทั้งหมด" เพื่อแก้ MT ID แล้วอัปโหลดไฟล์เดิมอีกครั้ง)`;
+            }
+          } else {
+            msg = `ไม่ได้เพิ่ม Lot ให้ใครเลย — มี ${result.unmatched_rows} รายการที่ MT ID ไม่ตรงกับสมาชิก\n\nวิธีแก้: เลื่อนลงไปตาราง "สมาชิกทั้งหมด" → คลิก MT ID ของสมาชิกที่ต้องการ → ใส่เลขจาก CSV → บันทึก แล้วอัปโหลดไฟล์เดิมอีกครั้ง`;
+          }
+          alert(msg);
+          currentFile = null;
+          fi.value = '';
+          $('preview-section').hidden = true;
+          await Promise.all([loadHistory(), loadUsers()]);
+        } catch (ex) {
+          let msg = ex.message || 'นำเข้าไม่สำเร็จ';
+          if (ex.data && ex.data.detail && typeof ex.data.detail === 'object') msg = ex.data.detail.message || msg;
+          showError(msg);
+          $('confirm-btn').disabled = false;
+          $('confirm-btn').textContent = 'ยืนยันนำเข้า';
+        }
+      });
+
+      // ─── History ───────────────────────────────────────────────
+      async function loadHistory() {
+        try {
+          const rows = await window.LotLegends.adminImports();
+          const tbody = $('history-rows');
+          if (!rows.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="muted small" style="text-align:center;padding:24px 0;">ยังไม่มีการนำเข้า</td></tr>';
+            return;
+          }
+          tbody.innerHTML = rows.map(r => `
+            <tr>
+              <td>${new Date(r.created_at).toLocaleString('th-TH')}</td>
+              <td>${escapeHtml(r.filename)}<br><small class="muted">${r.file_hash.slice(0,12)}…</small></td>
+              <td class="num">${fmtInt(r.total_rows)}</td>
+              <td class="num">${fmtInt(r.imported_rows)}</td>
+              <td class="num">${fmtInt(r.skipped_duplicates)}</td>
+              <td class="num">${fmtInt(r.unmatched_rows)}</td>
+              <td class="num">+${fmt(r.total_lots_added)}</td>
+            </tr>
+          `).join('');
+        } catch {
+          $('history-rows').innerHTML = '<tr><td colspan="7" class="muted small" style="text-align:center;padding:24px 0;">โหลดไม่สำเร็จ</td></tr>';
+        }
+      }
+
+      let usersCache = [];
+
+      async function loadUsers() {
+        try {
+          usersCache = await window.LotLegends.adminUsers();
+          const tbody = $('user-rows');
+          if (!usersCache.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="muted small" style="text-align:center;padding:24px 0;">ยังไม่มีสมาชิก</td></tr>';
+            return;
+          }
+          tbody.innerHTML = usersCache.map(r => renderUserRow(r)).join('');
+        } catch {
+          $('user-rows').innerHTML = '<tr><td colspan="6" class="muted small" style="text-align:center;padding:24px 0;">โหลดไม่สำเร็จ</td></tr>';
+        }
+      }
+
+      function renderUserRow(r) {
+        const xmCell = r.xm_id
+          ? `<code>${escapeHtml(r.xm_id)}</code>`
+          : '<span class="muted small">— ยังไม่ได้ตั้ง</span>';
+        return `
+          <tr data-uid="${r.id}">
+            <td>${escapeHtml(r.name)}</td>
+            <td><small class="muted">${escapeHtml(r.email)}</small></td>
+            <td class="cell-edit" data-field="xm_id" title="คลิกเพื่อแก้ไข MT ID">${xmCell}</td>
+            <td>${escapeHtml(r.display_handle || '—')}</td>
+            <td class="num">${fmt(r.total_lots)}</td>
+            <td>${r.is_admin ? '<span class="pill pill--gold">Admin</span>' : '<span class="muted small">Member</span>'}</td>
+          </tr>
+        `;
+      }
+
+      $('user-rows').addEventListener('click', (e) => {
+        const cell = e.target.closest('.cell-edit');
+        if (!cell) return;
+        const tr = cell.closest('tr');
+        const uid = parseInt(tr.dataset.uid, 10);
+        const field = cell.dataset.field;
+        if (cell.querySelector('input')) return;
+
+        const user = usersCache.find(u => u.id === uid);
+        const current = (user && user[field]) || '';
+
+        cell.innerHTML = `
+          <div class="cell-edit__form">
+            <input type="text" value="${escapeHtml(current)}" placeholder="เช่น 428298807" maxlength="40"/>
+            <button type="button" class="btn btn--gold btn--sm" data-act="save">บันทึก</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-act="cancel">ยกเลิก</button>
+          </div>
+          <p class="form__error cell-edit__error" hidden></p>
+        `;
+        const input = cell.querySelector('input');
+        input.focus();
+        input.select();
+
+        const restore = () => {
+          if (!user) return;
+          cell.innerHTML = user.xm_id
+            ? `<code>${escapeHtml(user.xm_id)}</code>`
+            : '<span class="muted small">— ยังไม่ได้ตั้ง</span>';
+        };
+
+        const save = async () => {
+          const val = input.value.trim();
+          const errBox = cell.querySelector('.cell-edit__error');
+          errBox.hidden = true;
+          try {
+            const updated = await window.LotLegends.adminUpdateUser(uid, { xm_id: val });
+            const idx = usersCache.findIndex(u => u.id === uid);
+            if (idx >= 0) usersCache[idx] = updated;
+            tr.outerHTML = renderUserRow(updated);
+          } catch (ex) {
+            errBox.textContent = ex.message || 'บันทึกไม่สำเร็จ';
+            errBox.hidden = false;
+          }
+        };
+
+        cell.querySelector('[data-act="save"]').addEventListener('click', save);
+        cell.querySelector('[data-act="cancel"]').addEventListener('click', restore);
+        input.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter') { ev.preventDefault(); save(); }
+          if (ev.key === 'Escape') { ev.preventDefault(); restore(); }
+        });
+      });
+
+      $('refresh-history').addEventListener('click', loadHistory);
+      $('refresh-users').addEventListener('click', loadUsers);
+
+      loadHistory();
+      loadUsers();
+    })();
+  </script>
+</body>
+</html>

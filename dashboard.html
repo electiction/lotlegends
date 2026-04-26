@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · The Lot Legends</title>
+  <meta name="description" content="แดชบอร์ดส่วนตัว — ติดตาม Lot ที่สะสม ระดับปัจจุบัน และของรางวัลที่พร้อมรับ" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page--app">
+
+  <!-- LOADER -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__mark">
+      <svg viewBox="0 0 60 60" width="56" height="56" aria-hidden="true">
+        <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+      </svg>
+      <span class="loader__letter">L</span>
+    </div>
+    <span class="loader__text">Loading your legend</span>
+  </div>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="brand">
+        <span class="brand__mark">L</span>
+        <span class="brand__text">The Lot Legends</span>
+      </a>
+      <nav class="nav__links">
+        <a href="index.html#tiers">Rewards</a>
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#leaderboard">Leaderboard</a>
+        <a href="index.html#faq">FAQ</a>
+        <a href="dashboard.html" class="is-active">Dashboard</a>
+        <a href="admin.html" id="admin-link" hidden>Admin</a>
+      </nav>
+      <button type="button" class="btn btn--ghost btn--nav" id="logout-btn" hidden>ออกจากระบบ</button>
+      <a href="login.html" class="btn btn--ghost btn--nav" id="login-link">เข้าสู่ระบบ</a>
+      <button class="nav__burger" id="nav-burger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <nav class="drawer__links">
+      <a href="index.html#tiers">Rewards</a>
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#leaderboard">Leaderboard</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="login.html">เข้าสู่ระบบ</a>
+      <a href="join.html" class="drawer__cta">เข้าร่วมโปรแกรม</a>
+    </nav>
+    <p class="drawer__footer muted small">Quiet Luxury for Traders</p>
+  </div>
+
+  <!-- HEADER -->
+  <section class="app-head">
+    <div class="container">
+      <p class="eyebrow">— Personal Dashboard</p>
+      <div class="app-head__row">
+        <div>
+          <h1 class="h2">สวัสดี, <em id="user-name">—</em></h1>
+          <p class="muted" id="user-meta">กำลังโหลดข้อมูล…</p>
+        </div>
+        <div class="app-head__actions">
+          <a href="#rewards" class="btn btn--ghost">ของรางวัลของฉัน</a>
+          <button type="button" class="btn btn--gold" id="add-lot-btn">บันทึกการเทรด</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="app-section">
+    <div class="container">
+      <div class="stats">
+        <div class="stat">
+          <p class="stat__label">Lots สะสมทั้งหมด</p>
+          <p class="stat__value"><span id="stat-total">0</span></p>
+          <p class="stat__sub" id="stat-monthly">+0 lots ในเดือนนี้</p>
+        </div>
+        <div class="stat">
+          <p class="stat__label">ระดับปัจจุบัน</p>
+          <p class="stat__value stat__value--serif" id="stat-tier">—</p>
+          <p class="stat__sub"><i class="dot dot--diamond"></i> <span id="stat-tier-rank">—</span></p>
+        </div>
+        <div class="stat">
+          <p class="stat__label">เหลืออีก</p>
+          <p class="stat__value"><span id="stat-remaining">0</span> <small>Lots</small></p>
+          <p class="stat__sub" id="stat-remaining-sub">เพื่อขึ้นระดับถัดไป</p>
+        </div>
+        <div class="stat">
+          <p class="stat__label">มูลค่ารางวัล</p>
+          <p class="stat__value">฿<span id="stat-value">0</span></p>
+          <p class="stat__sub">ที่ Tier ปัจจุบัน</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="app-section">
+    <div class="container">
+      <div class="card-panel">
+        <div class="panel__head">
+          <div>
+            <p class="eyebrow">— Your Journey</p>
+            <h3 class="panel__title">เส้นทางสู่ <em id="next-tier-name">—</em></h3>
+          </div>
+          <div class="panel__meta">
+            <span class="num-big" id="progress-fraction">0 / 0</span>
+            <span class="muted small" id="progress-pct">0%</span>
+          </div>
+        </div>
+
+        <div class="progress">
+          <div class="progress__track">
+            <div class="progress__fill" id="progress-fill" data-fill="0"></div>
+          </div>
+          <div class="progress__milestones" id="milestones"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TWO COL: Recent activity + Available rewards -->
+  <section class="app-section">
+    <div class="container app-grid">
+
+      <div class="card-panel">
+        <div class="panel__head">
+          <p class="eyebrow">— Recent Activity</p>
+          <h3 class="panel__title">การเทรดล่าสุด</h3>
+        </div>
+        <ul class="activity" id="activity-list">
+          <li class="muted small" style="text-align:center;padding:24px 0;">กำลังโหลด…</li>
+        </ul>
+      </div>
+
+      <div class="card-panel" id="rewards">
+        <div class="panel__head">
+          <p class="eyebrow">— Available Now</p>
+          <h3 class="panel__title">รางวัลที่คุณเลือกได้</h3>
+        </div>
+        <div id="rewards-list">
+          <p class="muted small" style="text-align:center;padding:16px 0;">กำลังโหลด…</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LEADERBOARD STANDING -->
+  <section class="app-section">
+    <div class="container">
+      <div class="card-panel">
+        <div class="panel__head">
+          <div>
+            <p class="eyebrow">— Your Standing</p>
+            <h3 class="panel__title">อันดับของคุณ <em>เดือนนี้</em></h3>
+          </div>
+          <div class="rank-pill" id="rank-pill">#— of —</div>
+        </div>
+        <p class="muted" id="rank-sub">เริ่มเทรดเพื่อปรากฏบน Leaderboard</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADD LOT MODAL -->
+  <div class="modal" id="lot-modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__panel card-panel" role="dialog" aria-modal="true" aria-labelledby="lot-modal-title">
+      <button type="button" class="modal__close" data-close-modal aria-label="Close">×</button>
+      <p class="eyebrow">— Manual Entry</p>
+      <h3 class="panel__title" id="lot-modal-title">บันทึกการเทรด</h3>
+      <p class="muted small">ใช้สำหรับ demo · ในระบบจริงจะ sync จาก XM Statement อัตโนมัติ</p>
+
+      <form id="lot-form" class="lot-form">
+        <div class="field-row">
+          <div class="field">
+            <label for="lot-symbol">Symbol</label>
+            <select id="lot-symbol" required>
+              <option>XAUUSD</option>
+              <option>EURUSD</option>
+              <option>GBPUSD</option>
+              <option>USDJPY</option>
+              <option>BTCUSD</option>
+              <option>US30</option>
+              <option>NAS100</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="lot-side">Side</label>
+            <select id="lot-side" required>
+              <option value="buy">Buy</option>
+              <option value="sell">Sell</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="lot-size">จำนวน Lots</label>
+          <input id="lot-size" type="number" min="0.01" max="1000" step="0.01" required placeholder="เช่น 1.50"/>
+        </div>
+        <p class="form__error" id="lot-error" hidden></p>
+        <div class="form__actions">
+          <button type="button" class="btn btn--ghost" data-close-modal>ยกเลิก</button>
+          <button type="submit" class="btn btn--gold">บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer__bottom">
+      <small>© 2026 The Lot Legends · Quiet Luxury for Traders</small>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="script.js"></script>
+  <script>
+    (() => {
+      if (!window.LotLegends.requireAuth()) return;
+
+      const TH_MONTH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      const $ = (id) => document.getElementById(id);
+
+      const fmtDate = (iso) => {
+        const d = new Date(iso);
+        return `${d.getDate()} ${TH_MONTH[d.getMonth()]} ${d.getFullYear() + 543}`.replace(`${d.getFullYear() + 543}`, String(d.getFullYear()));
+      };
+      const fmtNum = (n) => Math.round(n).toLocaleString('en-US');
+      const fmtLots = (n) => (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      // Logout button
+      $('logout-btn').hidden = false;
+      $('login-link').hidden = true;
+      $('logout-btn').addEventListener('click', () => window.LotLegends.logout());
+
+      // Add-lot modal
+      const modal = $('lot-modal');
+      const openModal  = () => { modal.classList.add('is-open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('no-scroll'); };
+      const closeModal = () => { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden','true'); document.body.classList.remove('no-scroll'); };
+      $('add-lot-btn').addEventListener('click', openModal);
+      modal.addEventListener('click', (e) => { if (e.target.matches('[data-close-modal]')) closeModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+      $('lot-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errBox = $('lot-error');
+        errBox.hidden = true;
+        try {
+          await window.LotLegends.addLot({
+            symbol: $('lot-symbol').value,
+            side:   $('lot-side').value,
+            lots:   parseFloat($('lot-size').value),
+          });
+          closeModal();
+          $('lot-form').reset();
+          await loadAll();
+        } catch (ex) {
+          errBox.textContent = ex.message || 'บันทึกไม่สำเร็จ';
+          errBox.hidden = false;
+        }
+      });
+
+      async function loadAll() {
+        try {
+          const [user, prog, lots, claims] = await Promise.all([
+            window.LotLegends.me(),
+            window.LotLegends.progress(),
+            window.LotLegends.lots(8),
+            window.LotLegends.claims(),
+          ]);
+          renderUser(user);
+          renderProgress(prog);
+          renderActivity(lots);
+          renderRewards(prog, claims);
+          loadLeaderboard(user);
+        } catch (ex) {
+          if (ex.status === 401) {
+            window.LotLegends.logout();
+            return;
+          }
+          console.error(ex);
+        }
+      }
+
+      function renderUser(u) {
+        $('user-name').textContent = u.name || u.email;
+        const memberSince = new Date(u.created_at);
+        const memberStr = `${TH_MONTH[memberSince.getMonth()]} ${memberSince.getFullYear()}`;
+        const xmPart = u.xm_id ? `XM ID · ${u.xm_id} · ` : '';
+        $('user-meta').textContent = `${xmPart}Member since ${memberStr}`;
+        if (u.is_admin) $('admin-link').hidden = false;
+      }
+
+      function renderProgress(p) {
+        $('stat-total').textContent     = fmtLots(p.total_lots);
+        $('stat-monthly').textContent   = `+${fmtLots(p.monthly_lots)} lots ในเดือนนี้`;
+        $('stat-tier').textContent      = p.current_tier.name;
+        $('stat-tier-rank').textContent = `Tier ${String(p.current_tier.rank).padStart(2,'0')} of 08`;
+        $('stat-remaining').textContent = fmtLots(p.lots_to_next);
+        $('stat-remaining-sub').textContent = p.next_tier ? `เพื่อขึ้นสู่ ${p.next_tier.name}` : 'คุณคือ Legend สูงสุดแล้ว';
+        $('stat-value').textContent     = fmtNum(p.rewards_value_thb || 0);
+
+        $('next-tier-name').textContent = (p.next_tier && p.next_tier.name) || 'Legend';
+        const target = p.next_tier ? p.next_tier.lots_required : p.current_tier.lots_required;
+        $('progress-fraction').textContent = `${fmtLots(p.total_lots)} / ${fmtNum(target)}`;
+        $('progress-pct').textContent = `${p.progress_pct.toFixed(1)}%`;
+
+        const fill = $('progress-fill');
+        fill.dataset.fill = String(p.progress_pct);
+        requestAnimationFrame(() => { fill.style.width = `${Math.max(0, Math.min(100, p.progress_pct))}%`; });
+
+        const ms = $('milestones');
+        ms.innerHTML = '';
+        const tiers = [
+          { key: 'starter',  name: 'Starter',  lots: 10 },
+          { key: 'bronze',   name: 'Bronze',   lots: 30 },
+          { key: 'silver',   name: 'Silver',   lots: 70 },
+          { key: 'gold',     name: 'Gold',     lots: 150 },
+          { key: 'platinum', name: 'Platinum', lots: 300 },
+          { key: 'diamond',  name: 'Diamond',  lots: 500 },
+          { key: 'master',   name: 'Master',   lots: 700 },
+          { key: 'legend',   name: 'Legend',   lots: 1000 },
+        ];
+        for (const t of tiers) {
+          const div = document.createElement('div');
+          div.className = 'ms';
+          if (p.total_lots >= t.lots) div.classList.add('is-done');
+          else if (p.next_tier && p.next_tier.key === t.key) div.classList.add('is-current');
+          div.innerHTML = `<i></i><span>${t.name}</span><small>${t.lots.toLocaleString('en-US')}</small>`;
+          ms.appendChild(div);
+        }
+      }
+
+      function renderActivity(rows) {
+        const list = $('activity-list');
+        if (!rows || rows.length === 0) {
+          list.innerHTML = `<li class="muted small" style="text-align:center;padding:24px 0;">
+            ยังไม่มีรายการเทรด · กดปุ่ม "บันทึกการเทรด" เพื่อเพิ่มรายการแรก
+          </li>`;
+          return;
+        }
+        list.innerHTML = rows.map(r => `
+          <li>
+            <div class="act__date">${fmtDate(r.traded_at)}</div>
+            <div class="act__body">
+              <span class="act__sym">${r.symbol}</span>
+              <span class="act__type">${r.side[0].toUpperCase() + r.side.slice(1)}</span>
+            </div>
+            <div class="act__lot">+ ${fmtLots(r.lots)} lots</div>
+          </li>
+        `).join('');
+      }
+
+      function renderRewards(p, claims) {
+        const TIERS = [
+          { key: 'gold',     name: 'Gold',     lots: 150,  reward: 'Apple Watch SE',     img: 'assets/tier-iphone.png' },
+          { key: 'platinum', name: 'Platinum', lots: 300,  reward: 'iPad (Gen 10)',      img: 'assets/tier-iphone.png' },
+          { key: 'diamond',  name: 'Diamond',  lots: 500,  reward: 'MacBook Air M3',     img: 'assets/tier-macbook.png' },
+          { key: 'master',   name: 'Master',   lots: 700,  reward: 'iPhone 17 Pro Max',  img: 'assets/tier-iphone.png' },
+          { key: 'legend',   name: 'Legend',   lots: 1000, reward: 'ทองคำ 1 บาท',         img: 'assets/tier-gold.png' },
+        ];
+        const claimedKeys = new Set((claims || []).map(c => c.tier));
+        const wrap = $('rewards-list');
+        const total = p.total_lots;
+        const html = TIERS.map(t => {
+          const reached = total >= t.lots;
+          const claimed = claimedKeys.has(t.key);
+          const remain  = Math.max(0, t.lots - total);
+          let btn;
+          if (claimed)      btn = `<button class="btn btn--ghost btn--sm" disabled>รับแล้ว</button>`;
+          else if (reached) btn = `<button class="btn btn--gold btn--sm" data-claim="${t.key}">รับรางวัล</button>`;
+          else              btn = `<button class="btn btn--ghost btn--sm" disabled>ล็อก</button>`;
+          const sub = claimed ? 'รอจัดส่ง / ติดต่อทีมงาน' : (reached ? 'พร้อมรับ — กดปุ่มด้านขวา' : `เหลืออีก ${fmtLots(remain)} lots`);
+          return `
+            <div class="reward-row${reached && !claimed ? '' : ' reward-row--locked'}">
+              <div class="reward__img"><img src="${t.img}" alt="" loading="lazy"/></div>
+              <div class="reward__body">
+                <p class="card__tier">${t.name} · ${t.lots.toLocaleString('en-US')} Lots</p>
+                <h4>${t.reward}</h4>
+                <p class="muted small">${sub}</p>
+              </div>
+              ${btn}
+            </div>`;
+        }).join('');
+        wrap.innerHTML = html;
+
+        wrap.querySelectorAll('[data-claim]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            btn.textContent = 'กำลังส่ง…';
+            try {
+              await window.LotLegends.claim(btn.dataset.claim);
+              await loadAll();
+            } catch (ex) {
+              alert(ex.message || 'ขอรับรางวัลไม่สำเร็จ');
+              btn.disabled = false;
+              btn.textContent = 'รับรางวัล';
+            }
+          });
+        });
+      }
+
+      async function loadLeaderboard(user) {
+        try {
+          const board = await window.LotLegends.leaderboard(50);
+          const myRow = user.display_handle
+            ? board.find(r => r.handle === user.display_handle)
+            : null;
+          const total = board.length;
+          if (myRow) {
+            $('rank-pill').textContent = `#${myRow.rank} of ${total}`;
+            $('rank-sub').textContent  = `อยู่ใน Tier ${myRow.tier_name} · เทรดเพิ่มเพื่อขยับอันดับ`;
+          } else if (total > 0) {
+            $('rank-pill').textContent = `— of ${total}`;
+            $('rank-sub').textContent  = 'ยังไม่มี Lot ที่บันทึก · เริ่มเทรดเพื่อปรากฏบน Leaderboard';
+          } else {
+            $('rank-pill').textContent = `— of 0`;
+            $('rank-sub').textContent  = 'ยังไม่มีตำนาน · เป็นคนแรกที่สะสม Lot';
+          }
+        } catch {
+          // Non-critical
+        }
+      }
+
+      loadAll();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เข้าสู่ระบบ · The Lot Legends</title>
+  <meta name="description" content="เข้าสู่ระบบเพื่อดู Dashboard ส่วนตัวของคุณ" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page--app">
+
+  <!-- LOADER -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__mark">
+      <svg viewBox="0 0 60 60" width="56" height="56" aria-hidden="true">
+        <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+      </svg>
+      <span class="loader__letter">L</span>
+    </div>
+    <span class="loader__text">Welcome back</span>
+  </div>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="brand">
+        <span class="brand__mark">L</span>
+        <span class="brand__text">The Lot Legends</span>
+      </a>
+      <nav class="nav__links">
+        <a href="index.html#tiers">Rewards</a>
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#leaderboard">Leaderboard</a>
+        <a href="index.html#faq">FAQ</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
+      <a href="join.html" class="btn btn--ghost btn--nav">เข้าร่วม</a>
+      <button class="nav__burger" id="nav-burger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <nav class="drawer__links">
+      <a href="index.html#tiers">Rewards</a>
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#leaderboard">Leaderboard</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="join.html" class="drawer__cta">เข้าร่วมโปรแกรม</a>
+    </nav>
+    <p class="drawer__footer muted small">Quiet Luxury for Traders</p>
+  </div>
+
+  <!-- LOGIN -->
+  <section class="auth">
+    <div class="container auth__wrap">
+      <div class="card-panel auth__panel">
+        <p class="eyebrow">— Member Sign In</p>
+        <h1 class="h2 auth__title">ยินดีต้อนรับ<br/><em>กลับมา</em></h1>
+        <p class="muted auth__sub">
+          ลงชื่อเข้าใช้เพื่อดู Lot ที่สะสม
+          ระดับปัจจุบัน และของรางวัลของคุณ
+        </p>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="l-email">อีเมล</label>
+            <input id="l-email" name="email" type="email" required autocomplete="email" placeholder="you@example.com"/>
+          </div>
+
+          <div class="field">
+            <label for="l-pw">รหัสผ่าน</label>
+            <input id="l-pw" name="password" type="password" required autocomplete="current-password" placeholder="••••••••"/>
+          </div>
+
+          <p class="form__error" id="login-error" hidden></p>
+
+          <div class="form__actions form__actions--single">
+            <button type="submit" class="btn btn--gold btn--lg" id="login-submit">เข้าสู่ระบบ</button>
+          </div>
+        </form>
+
+        <p class="auth__alt muted small">
+          ยังไม่มีบัญชี? <a href="join.html">สมัครเข้าร่วม</a>
+        </p>
+
+        <div class="auth__demo">
+          <p class="muted small auth__demo-title">— Demo accounts</p>
+          <button type="button" class="demo-chip" data-email="chris@lotlegends.dev">
+            <strong>Chris L.</strong><span>720 lots · Master</span>
+          </button>
+          <button type="button" class="demo-chip" data-email="kanya@lotlegends.dev">
+            <strong>Kanya R.</strong><span>421 lots · Gold</span>
+          </button>
+          <button type="button" class="demo-chip" data-email="demo@lotlegends.dev">
+            <strong>Demo User</strong><span>0 lots · Novice</span>
+          </button>
+          <p class="muted small">รหัสผ่านสำหรับทุกบัญชีตัวอย่าง: <code>demo1234</code></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__bottom">
+      <small>© 2026 The Lot Legends · Quiet Luxury for Traders</small>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="script.js"></script>
+  <script>
+    (() => {
+      if (window.LotLegends && window.LotLegends.isAuthed()) {
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get('next') || 'dashboard.html';
+        window.location.replace(next);
+        return;
+      }
+
+      const form  = document.getElementById('login-form');
+      const err   = document.getElementById('login-error');
+      const btn   = document.getElementById('login-submit');
+      const email = document.getElementById('l-email');
+      const pw    = document.getElementById('l-pw');
+
+      document.querySelectorAll('.demo-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          email.value = chip.dataset.email;
+          pw.value = 'demo1234';
+          email.focus();
+        });
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        err.hidden = true;
+        if (!email.value || !pw.value) {
+          err.textContent = 'กรุณากรอกอีเมลและรหัสผ่าน';
+          err.hidden = false;
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'กำลังเข้าสู่ระบบ…';
+        try {
+          const res = await window.LotLegends.login(email.value.trim(), pw.value);
+          window.LotLegends.setToken(res.access_token);
+          const params = new URLSearchParams(window.location.search);
+          const next = params.get('next') || 'dashboard.html';
+          window.location.replace(next);
+        } catch (ex) {
+          err.textContent = ex.message || 'เข้าสู่ระบบไม่สำเร็จ';
+          err.hidden = false;
+          btn.disabled = false;
+          btn.textContent = 'เข้าสู่ระบบ';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

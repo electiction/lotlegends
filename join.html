@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เข้าร่วมโปรแกรม · The Lot Legends</title>
+  <meta name="description" content="เปิดบัญชี XM ภายใต้ Partner Code ของเรา และเริ่มสะสม Lot ตั้งแต่ Lot แรก" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page--app">
+
+  <!-- LOADER -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__mark">
+      <svg viewBox="0 0 60 60" width="56" height="56" aria-hidden="true">
+        <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+      </svg>
+      <span class="loader__letter">L</span>
+    </div>
+    <span class="loader__text">Preparing your invitation</span>
+  </div>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="brand">
+        <span class="brand__mark">L</span>
+        <span class="brand__text">The Lot Legends</span>
+      </a>
+      <nav class="nav__links">
+        <a href="index.html#tiers">Rewards</a>
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#leaderboard">Leaderboard</a>
+        <a href="index.html#faq">FAQ</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="login.html">เข้าสู่ระบบ</a>
+      </nav>
+      <a href="join.html" class="btn btn--ghost btn--nav is-active">เข้าร่วม</a>
+      <button class="nav__burger" id="nav-burger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <nav class="drawer__links">
+      <a href="index.html#tiers">Rewards</a>
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#leaderboard">Leaderboard</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="login.html">เข้าสู่ระบบ</a>
+      <a href="join.html" class="drawer__cta">เข้าร่วมโปรแกรม</a>
+    </nav>
+    <p class="drawer__footer muted small">Quiet Luxury for Traders</p>
+  </div>
+
+  <!-- JOIN -->
+  <section class="join">
+    <div class="container join__grid">
+
+      <aside class="join__side">
+        <p class="eyebrow">— Membership · Invitation</p>
+        <h1 class="h1-join">
+          เข้าสู่<br/><em>วงในของเทรดเดอร์</em>
+        </h1>
+        <p class="muted join__sub">
+          กรอกข้อมูลสั้นๆ เพื่อเริ่มสะสม Lot
+          ทุกการเทรดของคุณจะถูกบันทึกอย่างโปร่งใส
+          และเปลี่ยนเป็นรางวัลที่จับต้องได้จริง
+        </p>
+
+        <ul class="join__bullets">
+          <li><i class="bul"></i><span>ไม่มีค่าใช้จ่าย ไม่มีค่าสมาชิก</span></li>
+          <li><i class="bul"></i><span>สะสม Lot ได้ตลอดชีพ ไม่มีหมดอายุ</span></li>
+          <li><i class="bul"></i><span>ดูความคืบหน้าผ่าน Dashboard ส่วนตัว</span></li>
+          <li><i class="bul"></i><span>จัดส่งรางวัลฟรีทั่วประเทศไทย</span></li>
+        </ul>
+
+        <p class="muted small join__legal">
+          การเข้าร่วมหมายถึงคุณยอมรับ <a href="#">เงื่อนไขการให้บริการ</a>
+          และ <a href="#">นโยบายความเป็นส่วนตัว</a> ของเรา
+        </p>
+      </aside>
+
+      <div class="join__form-wrap">
+        <div class="card-panel">
+          <div class="stepper">
+            <div class="stepper__dot is-active"><span>01</span><small>Personal</small></div>
+            <div class="stepper__line"></div>
+            <div class="stepper__dot"><span>02</span><small>XM Account</small></div>
+            <div class="stepper__line"></div>
+            <div class="stepper__dot"><span>03</span><small>Confirm</small></div>
+          </div>
+
+          <form id="join-form" novalidate>
+
+            <!-- Step 1 -->
+            <fieldset class="form-step">
+              <legend class="form__legend">ข้อมูลส่วนตัว</legend>
+
+              <div class="field">
+                <label for="f-name">ชื่อ - นามสกุล</label>
+                <input id="f-name" name="name" type="text" required autocomplete="name"/>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="f-email">อีเมล</label>
+                  <input id="f-email" name="email" type="email" required autocomplete="email"/>
+                </div>
+                <div class="field">
+                  <label for="f-phone">เบอร์โทรศัพท์</label>
+                  <input id="f-phone" name="phone" type="tel" required autocomplete="tel"/>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="f-line">Line ID <small class="muted">(ไม่บังคับ)</small></label>
+                  <input id="f-line" name="lineId" type="text"/>
+                </div>
+                <div class="field">
+                  <label for="f-pw">รหัสผ่าน</label>
+                  <input id="f-pw" name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="อย่างน้อย 8 ตัวอักษร"/>
+                </div>
+              </div>
+
+              <div class="form__actions">
+                <span></span>
+                <button type="button" class="btn btn--gold" data-step="next">ถัดไป →</button>
+              </div>
+            </fieldset>
+
+            <!-- Step 2 -->
+            <fieldset class="form-step">
+              <legend class="form__legend">บัญชี XM ของคุณ</legend>
+
+              <div class="field">
+                <label for="f-xmid">XM Trading ID</label>
+                <input id="f-xmid" name="xmId" type="text" required placeholder="เช่น 24091877" inputmode="numeric"/>
+                <small class="field__hint">เลขบัญชีที่ใช้เข้า MT4 / MT5</small>
+              </div>
+
+              <div id="claim-banner" class="claim-banner" hidden>
+                <div class="claim-banner__icon" id="claim-icon">✓</div>
+                <div class="claim-banner__body">
+                  <p class="claim-banner__title" id="claim-title"></p>
+                  <p class="claim-banner__sub" id="claim-sub"></p>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="f-acc">ประเภทบัญชี</label>
+                <select id="f-acc" name="accountType" required>
+                  <option value="">— เลือก —</option>
+                  <option>Standard</option>
+                  <option>Micro</option>
+                  <option>Ultra Low</option>
+                  <option>Zero / Shares</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="checkbox">
+                  <input type="checkbox" required/>
+                  <span>ฉันยืนยันว่าได้สมัครภายใต้ Partner Code <em>LOTLEGENDS</em></span>
+                </label>
+              </div>
+
+              <div class="form__actions">
+                <button type="button" class="btn btn--ghost" data-step="back">← ย้อนกลับ</button>
+                <button type="button" class="btn btn--gold" data-step="next">ถัดไป →</button>
+              </div>
+            </fieldset>
+
+            <!-- Step 3 -->
+            <fieldset class="form-step">
+              <legend class="form__legend">ยืนยันการเข้าร่วม</legend>
+
+              <p class="muted">
+                เกือบเสร็จแล้ว เลือกของรางวัลที่คุณสนใจมากที่สุด
+                เพื่อให้ทีมแนะนำคุณได้เหมาะสม
+              </p>
+
+              <div class="goal-grid">
+                <label class="goal">
+                  <input type="radio" name="goal" value="watch"/>
+                  <div>
+                    <span class="goal__tier">Gold</span>
+                    <strong>Apple Watch</strong>
+                    <small class="muted">150 lots</small>
+                  </div>
+                </label>
+                <label class="goal">
+                  <input type="radio" name="goal" value="ipad"/>
+                  <div>
+                    <span class="goal__tier">Platinum</span>
+                    <strong>iPad Gen 10</strong>
+                    <small class="muted">300 lots</small>
+                  </div>
+                </label>
+                <label class="goal">
+                  <input type="radio" name="goal" value="macbook" checked/>
+                  <div>
+                    <span class="goal__tier">Diamond</span>
+                    <strong>MacBook Air M3</strong>
+                    <small class="muted">500 lots</small>
+                  </div>
+                </label>
+                <label class="goal">
+                  <input type="radio" name="goal" value="iphone"/>
+                  <div>
+                    <span class="goal__tier">Master</span>
+                    <strong>iPhone 17 Pro Max</strong>
+                    <small class="muted">700 lots</small>
+                  </div>
+                </label>
+                <label class="goal">
+                  <input type="radio" name="goal" value="gold"/>
+                  <div>
+                    <span class="goal__tier">Legend</span>
+                    <strong>ทองคำ 1 บาท</strong>
+                    <small class="muted">1,000 lots</small>
+                  </div>
+                </label>
+                <label class="goal">
+                  <input type="radio" name="goal" value="undecided"/>
+                  <div>
+                    <span class="goal__tier">—</span>
+                    <strong>ยังไม่ตัดสินใจ</strong>
+                    <small class="muted">เลือกทีหลัง</small>
+                  </div>
+                </label>
+              </div>
+
+              <div class="form__actions">
+                <button type="button" class="btn btn--ghost" data-step="back">← ย้อนกลับ</button>
+                <button type="submit" class="btn btn--gold">ยืนยันเข้าร่วม</button>
+              </div>
+            </fieldset>
+
+          </form>
+
+          <p class="form__error form__error--global" id="join-error" hidden></p>
+
+          <div class="form-success" id="form-success" hidden>
+            <div class="success__mark">
+              <svg viewBox="0 0 64 64" width="48" height="48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="32" cy="32" r="30" opacity="0.4"/>
+                <path d="M20 33 L29 42 L46 24" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>ยินดีต้อนรับสู่<br/><em>The Lot Legends</em></h3>
+            <p class="muted">
+              บัญชีของคุณถูกสร้างเรียบร้อย
+              เริ่มสะสม Lot ได้ทันทีที่ Dashboard
+            </p>
+            <a href="dashboard.html" class="btn btn--gold btn--lg">เข้าสู่ Dashboard ของฉัน</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__bottom">
+      <small>© 2026 The Lot Legends · Trading involves risk · Past performance does not guarantee future results</small>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="script.js"></script>
+  <script>
+    (() => {
+      const form    = document.getElementById('join-form');
+      const errBox  = document.getElementById('join-error');
+      const success = document.getElementById('form-success');
+      if (!form) return;
+
+      // ─── MT ID claim-preview ─────────────────────────────────────
+      const xmInput   = document.getElementById('f-xmid');
+      const banner    = document.getElementById('claim-banner');
+      const bIcon     = document.getElementById('claim-icon');
+      const bTitle    = document.getElementById('claim-title');
+      const bSub      = document.getElementById('claim-sub');
+      let claimState  = { mt_id: null, has_placeholder: false, total_lots: 0, trade_count: 0 };
+      let lookupTimer = null;
+      let lookupSeq   = 0;
+
+      const showBanner = (variant, icon, title, sub) => {
+        banner.hidden = false;
+        banner.classList.remove('claim-banner--miss', 'claim-banner--checking');
+        if (variant === 'miss') banner.classList.add('claim-banner--miss');
+        if (variant === 'checking') banner.classList.add('claim-banner--checking');
+        bIcon.textContent = icon;
+        bTitle.textContent = title;
+        bSub.innerHTML = sub;
+      };
+
+      const hideBanner = () => {
+        banner.hidden = true;
+        claimState = { mt_id: null, has_placeholder: false, total_lots: 0, trade_count: 0 };
+      };
+
+      const checkClaim = async (mt) => {
+        const seq = ++lookupSeq;
+        showBanner('checking', '', 'กำลังตรวจสอบ…', 'รอสักครู่ เรากำลังเช็คประวัติของ MT ID นี้');
+        try {
+          const res = await window.LotLegends.previewClaim(mt);
+          if (seq !== lookupSeq) return; // stale
+          claimState = res;
+          if (res.has_placeholder && res.total_lots > 0) {
+            const lots = res.total_lots.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            showBanner(
+              'hit', '✓',
+              'พบ Lots ที่สะสมไว้แล้ว!',
+              `MT ID นี้มี <span class="claim-banner__lots">${lots} Lots</span> จาก ${res.trade_count.toLocaleString()} รายการเทรด — สมัครเสร็จจะถูกผูกกับบัญชีคุณทันที`
+            );
+          } else {
+            showBanner(
+              'miss', '·',
+              'ยังไม่มีประวัติในระบบ',
+              'ไม่เป็นไร — เริ่มสะสม Lot ได้ตั้งแต่การเทรดถัดไป (ปกติแล้ว Partner จะอัปเดตข้อมูลให้สัปดาห์ละครั้ง)'
+            );
+          }
+        } catch (ex) {
+          if (seq !== lookupSeq) return;
+          hideBanner();
+        }
+      };
+
+      xmInput.addEventListener('input', () => {
+        const v = xmInput.value.trim();
+        clearTimeout(lookupTimer);
+        if (v.length < 4) { hideBanner(); return; }
+        lookupTimer = setTimeout(() => checkClaim(v), 350);
+      });
+
+      // ─── Submit ──────────────────────────────────────────────────
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        errBox.hidden = true;
+
+        const data = {
+          name:          document.getElementById('f-name').value.trim(),
+          email:         document.getElementById('f-email').value.trim(),
+          phone:         document.getElementById('f-phone').value.trim() || null,
+          line_id:       document.getElementById('f-line').value.trim() || null,
+          password:      document.getElementById('f-pw').value,
+          xm_id:         document.getElementById('f-xmid').value.trim() || null,
+          account_type:  document.getElementById('f-acc').value || null,
+          target_reward: (document.querySelector('input[name="goal"]:checked') || {}).value || null,
+        };
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'กำลังเปิดบัญชี…';
+
+        try {
+          const res = await window.LotLegends.register(data);
+          window.LotLegends.setToken(res.access_token);
+
+          // Customise the success card based on whether we just claimed a placeholder
+          if (res.claimed_placeholder && res.claimed_lots > 0) {
+            const lots = res.claimed_lots.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const heading = success.querySelector('h3');
+            const para    = success.querySelector('p');
+            if (heading) heading.innerHTML = `เชื่อมบัญชีสำเร็จ<br/><em>${lots} Lots พร้อมแล้ว</em>`;
+            if (para)    para.innerHTML = `ระบบพบประวัติการเทรดของ MT ID นี้ และผูกเข้ากับบัญชีของคุณเรียบร้อย<br/>กำลังนำคุณไปยัง Dashboard…`;
+          } else {
+            const para = success.querySelector('p');
+            if (para)  para.innerHTML = `บัญชีของคุณถูกสร้างเรียบร้อย<br/>กำลังนำคุณไปยัง Dashboard…`;
+          }
+
+          form.style.display = 'none';
+          success.hidden = false;
+          success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
+        } catch (ex) {
+          errBox.textContent = ex.message || 'สมัครไม่สำเร็จ';
+          errBox.hidden = false;
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'ยืนยันเข้าร่วม';
+          errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, true);
+    })();
+  </script>
+</body>
+</html>
