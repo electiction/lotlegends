@@ -212,6 +212,12 @@ class AdminUserUpdate(BaseModel):
     xm_id: Optional[str] = Field(default=None, max_length=40)
     display_handle: Optional[str] = Field(default=None, max_length=40)
     is_admin: Optional[bool] = None
+    new_password: Optional[str] = Field(
+        default=None,
+        min_length=8,
+        max_length=128,
+        description="New login password (bcrypt; cannot read old password).",
+    )
 
 
 class CreatePlaceholdersIn(BaseModel):

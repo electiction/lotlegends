@@ -801,6 +801,12 @@ def admin_update_user(
     if payload.is_admin is not None and target.id != admin.id:
         target.is_admin = bool(payload.is_admin)
 
+    if payload.new_password is not None:
+        npw = payload.new_password.strip()
+        if len(npw) < 8:
+            raise HTTPException(status_code=400, detail="รหัสผ่านต้องมีอย่างน้อย 8 ตัว")
+        target.password_hash = hash_password(npw)
+
     db.commit()
     db.refresh(target)
 

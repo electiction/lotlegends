@@ -222,10 +222,11 @@
                 <th>Handle</th>
                 <th class="num">Lots สะสม</th>
                 <th>สิทธิ์</th>
+                <th>จัดการ</th>
               </tr>
             </thead>
             <tbody id="user-rows">
-              <tr><td colspan="6" class="muted small" style="text-align:center;padding:24px 0;">กำลังโหลด…</td></tr>
+              <tr><td colspan="7" class="muted small" style="text-align:center;padding:24px 0;">กำลังโหลด…</td></tr>
             </tbody>
           </table>
         </div>
@@ -480,12 +481,12 @@
           usersCache = await window.LotLegends.adminUsers();
           const tbody = $('user-rows');
           if (!usersCache.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="muted small" style="text-align:center;padding:24px 0;">ยังไม่มีสมาชิก</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="muted small" style="text-align:center;padding:24px 0;">ยังไม่มีสมาชิก</td></tr>';
             return;
           }
           tbody.innerHTML = usersCache.map(r => renderUserRow(r)).join('');
         } catch {
-          $('user-rows').innerHTML = '<tr><td colspan="6" class="muted small" style="text-align:center;padding:24px 0;">โหลดไม่สำเร็จ</td></tr>';
+          $('user-rows').innerHTML = '<tr><td colspan="7" class="muted small" style="text-align:center;padding:24px 0;">โหลดไม่สำเร็จ</td></tr>';
         }
       }
 
@@ -501,11 +502,46 @@
             <td>${escapeHtml(r.display_handle || '—')}</td>
             <td class="num">${fmt(r.total_lots)}</td>
             <td>${r.is_admin ? '<span class="pill pill--gold">Admin</span>' : '<span class="muted small">Member</span>'}</td>
+            <td>
+              <button type="button" class="btn btn--ghost btn--sm" data-reset-pw title="ตั้งรหัส login ใหม่ให้ลูกค้า">รีเซ็ตรหัส</button>
+            </td>
           </tr>
         `;
       }
 
-      $('user-rows').addEventListener('click', (e) => {
+      $('user-rows').addEventListener('click', async (e) => {
+        const resetBtn = e.target.closest('[data-reset-pw]');
+        if (resetBtn) {
+          e.preventDefault();
+          const tr = resetBtn.closest('tr');
+          const uid = parseInt(tr.dataset.uid, 10);
+          const user = usersCache.find((u) => u.id === uid);
+          if (!user) return;
+          const emailLine = `สมาชิก: ${user.email} (${user.name})`;
+          const p1 = window.prompt(
+            emailLine + '\n\nพิมพ์รหัสผ่านใหม่ (อย่างน้อย 8 ตัว) — ลูกค้าใช้ login ทันที',
+            '',
+          );
+          if (p1 === null) return;
+          const pw1 = p1.trim();
+          if (pw1.length < 8) {
+            alert('รหัสสั้นเกินไป ต้องมีอย่างน้อย 8 ตัว');
+            return;
+          }
+          const p2 = window.prompt('ยืนยันรหัสผ่านอีกครั้ง', '');
+          if (p2 === null) return;
+          if (p2 !== pw1) {
+            alert('รหัสยืนยันไม่ตรงกัน');
+            return;
+          }
+          try {
+            await window.LotLegends.adminUpdateUser(uid, { new_password: pw1 });
+            alert('ตั้งรหัสใหม่สำเร็จ — ส่งรหัสนี้ให้ลูกค้าทาง Line / โทร ได้เลย (ระบบไม่เก็บรหัสอ่านย้อนได้แล้ว)');
+          } catch (ex) {
+            alert(ex.message || 'รีเซ็ตรหัสไม่สำเร็จ');
+          }
+          return;
+        }
         const cell = e.target.closest('.cell-edit');
         if (!cell) return;
         const tr = cell.closest('tr');
