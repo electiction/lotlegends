@@ -178,6 +178,8 @@
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
+      /* join.html registers its own submit handler (capture) for /api/auth/register */
+      if (form.id === 'join-form') return;
       const success = document.getElementById('form-success');
       if (success) {
         form.style.display = 'none';

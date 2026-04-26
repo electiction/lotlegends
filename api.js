@@ -9,6 +9,27 @@
   const api = {
     base: (window.LOTLEGENDS_API || '') + '/api',
 
+    /** Turn FastAPI / Pydantic `detail` into a user-visible string. */
+    _formatDetail(detail) {
+      if (detail == null) return null;
+      if (typeof detail === 'string') return detail;
+      if (Array.isArray(detail)) {
+        return detail
+          .map((e) => {
+            if (typeof e === 'string') return e;
+            if (e && typeof e.msg === 'string') return e.msg;
+            if (e && typeof e.message === 'string') return e.message;
+            return JSON.stringify(e);
+          })
+          .filter(Boolean)
+          .join(' — ');
+      }
+      if (typeof detail === 'object' && detail.message) {
+        return typeof detail.message === 'string' ? detail.message : JSON.stringify(detail.message);
+      }
+      return null;
+    },
+
     getToken() {
       try { return localStorage.getItem(TOKEN_KEY); }
       catch { return null; }
@@ -41,8 +62,10 @@
       try { data = text ? JSON.parse(text) : null; } catch { data = text; }
 
       if (!res.ok) {
-        const msg = (data && data.detail) || res.statusText || 'Request failed';
-        const err = new Error(typeof msg === 'string' ? msg : 'Request failed');
+        const fromDetail = this._formatDetail(data && data.detail);
+        const msg = fromDetail || (typeof data === 'string' && data) || res.statusText
+          || (res.status ? `HTTP ${res.status}` : 'Request failed');
+        const err = new Error(msg);
         err.status = res.status;
         err.data = data;
         if (res.status === 401 && auth) {
