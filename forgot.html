@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ลืมรหัสผ่าน · The Lot Legends</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page--app">
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="brand">
+        <span class="brand__mark">L</span>
+        <span class="brand__text">The Lot Legends</span>
+      </a>
+      <nav class="nav__links">
+        <a href="index.html#tiers">Rewards</a>
+        <a href="login.html">เข้าสู่ระบบ</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="auth">
+    <div class="container auth__wrap">
+      <div class="card-panel auth__panel">
+        <p class="eyebrow">— Password</p>
+        <h1 class="h2 auth__title">ลืม<br/><em>รหัสผ่าน</em></h1>
+        <p class="muted auth__sub">
+          กรอกอีเมลที่ลงทะเบียน เราจะส่งลิงก์รีเซ็ตรหัส (อายุ 1 ชั่วโมง) ไปทางอีเมล
+        </p>
+
+        <form id="forgot-form" novalidate>
+          <div class="field">
+            <label for="f-email">อีเมล</label>
+            <input id="f-email" type="email" required autocomplete="email" placeholder="you@example.com" />
+          </div>
+          <p class="form__error" id="forgot-error" hidden></p>
+          <div class="form__actions form__actions--single">
+            <button type="submit" class="btn btn--gold btn--lg" id="forgot-btn">ส่งลิงก์รีเซ็ต</button>
+          </div>
+        </form>
+
+        <p class="auth__alt muted small" id="forgot-success" hidden>
+          หากอีเมลนี้มีในระบบ คุณจะได้รับข้อความเร็วๆ นี้ — ตรวจกล่อง junk / สแปมด้วย
+        </p>
+        <p class="auth__alt muted small"><a href="login.html">← กลับไปเข้าสู่ระบบ</a></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__bottom">
+      <small>© 2026 The Lot Legends</small>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script>
+    (() => {
+      const form = document.getElementById('forgot-form');
+      const err  = document.getElementById('forgot-error');
+      const ok   = document.getElementById('forgot-success');
+      const btn  = document.getElementById('forgot-btn');
+      const em   = document.getElementById('f-email');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        err.hidden = true;
+        ok.hidden = true;
+        const email = em.value.trim();
+        if (!email) {
+          err.textContent = 'กรุณากรอกอีเมล';
+          err.hidden = false;
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = 'กำลังส่ง…';
+        try {
+          const res = await window.LotLegends.forgotPassword(email);
+          em.disabled = true;
+          form.style.display = 'none';
+          if (res && res.message) ok.textContent = res.message;
+          ok.hidden = false;
+        } catch (ex) {
+          err.textContent = ex.message || 'ส่งไม่สำเร็จ';
+          err.hidden = false;
+          btn.disabled = false;
+          btn.textContent = 'ส่งลิงก์รีเซ็ต';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

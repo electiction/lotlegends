@@ -79,6 +79,10 @@
     register(payload)        { return this.request('/auth/register', { method: 'POST', body: payload, auth: false }); },
     previewClaim(mt_id)      { return this.request(`/auth/preview-claim/${encodeURIComponent(mt_id)}`, { auth: false }); },
     login(email, password)   { return this.request('/auth/login',    { method: 'POST', body: { email, password }, auth: false }); },
+    forgotPassword(email)     { return this.request('/auth/forgot-password', { method: 'POST', body: { email }, auth: false }); },
+    resetPassword(token, new_password) {
+      return this.request('/auth/reset-password', { method: 'POST', body: { token, new_password }, auth: false });
+    },
     me()                     { return this.request('/me'); },
     progress()               { return this.request('/me/progress'); },
     lots(limit = 20)         { return this.request(`/me/lots?limit=${limit}`); },

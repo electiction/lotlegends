@@ -8,11 +8,12 @@ from __future__ import annotations
 import hashlib
 import logging
 import os
+import secrets
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, status
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -29,7 +30,8 @@ from .auth import (
 )
 from .csv_parser import ParseReport, parse_csv_bytes
 from .database import SessionLocal, get_db, init_db
-from .models import CsvImport, LotEntry, RewardClaim, TradeJournal, User
+from .mail import send_password_reset_email, smtp_configured
+from .models import CsvImport, LotEntry, PasswordResetToken, RewardClaim, TradeJournal, User
 
 log = logging.getLogger("lotlegends")
 logging.basicConfig(
@@ -271,6 +273,102 @@ def login(payload: schemas.LoginIn, db: Session = Depends(get_db)):
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="อีเมลหรือรหัสผ่านไม่ถูกต้อง")
     return schemas.TokenOut(access_token=create_access_token(user.id))
+
+
+def _public_base_url(request: Request) -> str:
+    """Used in password-reset email links. Prefer LOTLEGENDS_BASE_URL (https://your.com)."""
+    env = (os.getenv("LOTLEGENDS_BASE_URL") or "").strip().rstrip("/")
+    if env:
+        return env
+    proto = (request.headers.get("x-forwarded-proto") or request.url.scheme or "https").split(",")[0].strip()
+    host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").split(",")[0].strip()
+    if not host:
+        return ""
+    return f"{proto}://{host}".rstrip("/")
+
+
+def _dt_aware_utc(d: datetime) -> datetime:
+    if d.tzinfo is not None:
+        return d.astimezone(timezone.utc)
+    return d.replace(tzinfo=timezone.utc)
+
+
+@app.post("/api/auth/forgot-password", response_model=schemas.ForgotPasswordOut)
+def forgot_password(
+    payload: schemas.ForgotPasswordIn,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """Send a one-time reset link to the email (same message if unknown — anti-enumeration)."""
+    email = (payload.email or "").lower().strip()
+    if not email or email.endswith(PLACEHOLDER_EMAIL_DOMAIN):
+        return schemas.ForgotPasswordOut()
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return schemas.ForgotPasswordOut()
+
+    db.query(PasswordResetToken).filter(PasswordResetToken.user_id == user.id).delete()
+    token = secrets.token_urlsafe(32)
+    exp = datetime.now(timezone.utc) + timedelta(hours=1)
+    db.add(PasswordResetToken(user_id=user.id, token=token, expires_at=exp, used=False))
+    db.commit()
+
+    base = _public_base_url(request)
+    if not base:
+        log.error(
+            "forgot-password: set LOTLEGENDS_BASE_URL (e.g. https://lotlegends.onrender.com) so email links work",
+        )
+        return schemas.ForgotPasswordOut()
+
+    reset_url = f"{base}/reset-password.html?token={token}"
+    sent = send_password_reset_email(user.email, reset_url)
+    if not sent:
+        if smtp_configured():
+            log.error("forgot-password: SMTP send failed for %s", user.email)
+        else:
+            log.warning(
+                "forgot-password: LOTLEGENDS_SMTP_* not set — email not sent. reset URL=%s",
+                reset_url,
+            )
+
+    return schemas.ForgotPasswordOut()
+
+
+@app.post("/api/auth/reset-password", response_model=schemas.ForgotPasswordOut)
+def reset_password(
+    payload: schemas.ResetPasswordIn,
+    db: Session = Depends(get_db),
+):
+    t = (payload.token or "").strip()
+    if len(t) < 20:
+        raise HTTPException(status_code=400, detail="ลิงก์ไม่ถูกต้อง")
+
+    row = (
+        db.query(PasswordResetToken)
+        .filter(PasswordResetToken.token == t, PasswordResetToken.used.is_(False))
+        .first()
+    )
+    if not row:
+        raise HTTPException(status_code=400, detail="ลิงก์ไม่ถูกต้อง หมดอายุ หรือใช้แล้ว")
+    if _dt_aware_utc(row.expires_at) < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="ลิงก์หมดอายุ กรุณาขอรีเซ็ตรหัสอีกครั้ง")
+
+    npw = (payload.new_password or "").strip()
+    if len(npw) < 8:
+        raise HTTPException(status_code=400, detail="รหัสผ่านต้องมีอย่างน้อย 8 ตัว")
+
+    user = db.query(User).filter(User.id == row.user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="ไม่พบบัญชี")
+
+    user.password_hash = hash_password(npw)
+    db.delete(row)
+    db.commit()
+
+    return schemas.ForgotPasswordOut(
+        message="ตั้งรหัสผ่านใหม่สำเร็จ ลงชื่อเข้าใช้ด้วยรหัสใหม่ได้ทันที",
+    )
 
 
 # ─── Me / progress ─────────────────────────────────────────────────

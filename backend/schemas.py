@@ -24,6 +24,20 @@ class LoginIn(BaseModel):
     password: str
 
 
+class ForgotPasswordIn(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordOut(BaseModel):
+    ok: bool = True
+    message: str = "หากอีเมลนี้มีในระบบ คุณจะได้รับลิงก์รีเซ็ตรหัสผ่านในไม่กี่นาที กรุณาตรวจสอบกล่อง junk / สแปมด้วย"
+
+
+class ResetPasswordIn(BaseModel):
+    token: str = Field(..., min_length=20, max_length=90)
+    new_password: str = Field(..., min_length=8, max_length=128)
+
+
 class TokenOut(BaseModel):
     access_token: str
     token_type: str = "bearer"
