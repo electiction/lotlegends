@@ -137,9 +137,11 @@
 
       <div class="card-panel">
         <div class="panel__head">
-          <p class="eyebrow">— Recent Activity</p>
-          <h3 class="panel__title">การเทรดล่าสุด</h3>
+          <p class="eyebrow">— Private journal</p>
+          <h3 class="panel__title">บันทึกการเทรดส่วนตัว</h3>
         </div>
+        <p class="journal-hint">สะสมสถิติเพื่อมองยอดรวม P&amp;L ของคุณเอง ไม่นับรวม <strong>Lots รางวัล</strong> ด้านบน (ข้อมูลรางวัลมาจาก Partner/CSV โดยตรง)</p>
+        <p class="journal-summary" id="journal-summary" hidden>กำลังคำนวณ…</p>
         <ul class="activity" id="activity-list">
           <li class="muted small" style="text-align:center;padding:24px 0;">กำลังโหลด…</li>
         </ul>
@@ -179,9 +181,9 @@
     <div class="modal__backdrop" data-close-modal></div>
     <div class="modal__panel card-panel" role="dialog" aria-modal="true" aria-labelledby="lot-modal-title">
       <button type="button" class="modal__close" data-close-modal aria-label="Close">×</button>
-      <p class="eyebrow">— Manual Entry</p>
-      <h3 class="panel__title" id="lot-modal-title">บันทึกการเทรด</h3>
-      <p class="muted small">ใช้สำหรับ demo · ในระบบจริงจะ sync จาก XM Statement อัตโนมัติ</p>
+      <p class="eyebrow">— Private journal</p>
+      <h3 class="panel__title" id="lot-modal-title">เพิ่มรายการ</h3>
+      <p class="muted small">สำหรับดูยอดรวมด้านล่าง — จะ <strong>ไม่เพิ่ม</strong> «Lots สะสมทั้งหมด» สำหรับรางวัล</p>
 
       <form id="lot-form" class="lot-form">
         <div class="field-row">
@@ -206,8 +208,17 @@
           </div>
         </div>
         <div class="field">
-          <label for="lot-size">จำนวน Lots</label>
+          <label for="lot-size">ขนาด lot ของออเดอร์</label>
           <input id="lot-size" type="number" min="0.01" max="1000" step="0.01" required placeholder="เช่น 1.50"/>
+          <span class="field--hint">ใช้ดู volume รวมในสมุดเท่านั้น ไม่นับรางวัล</span>
+        </div>
+        <div class="field">
+          <label for="tj-pnl">กำไร / ขาดทุน (P&amp;L) <span class="muted" style="font-size:12px">— ไม่บังคับ</span></label>
+          <input id="tj-pnl" type="number" step="0.01" placeholder="เช่น 52.30 หรือ -10.5"/>
+        </div>
+        <div class="field">
+          <label for="tj-note">โน้ต <span class="muted" style="font-size:12px">— ไม่บังคับ</span></label>
+          <textarea id="tj-note" rows="2" placeholder="ออเดอร์นี้สั้น ๆ รู้สึกยังไง ฯลฯ"></textarea>
         </div>
         <p class="form__error" id="lot-error" hidden></p>
         <div class="form__actions">
@@ -257,11 +268,23 @@
         e.preventDefault();
         const errBox = $('lot-error');
         errBox.hidden = true;
+        const pnlRaw = $('tj-pnl').value.trim();
+        let pnl = null;
+        if (pnlRaw !== '') {
+          pnl = parseFloat(pnlRaw);
+          if (Number.isNaN(pnl)) {
+            errBox.textContent = 'P/L ต้องเป็นตัวเลข';
+            errBox.hidden = false;
+            return;
+          }
+        }
         try {
-          await window.LotLegends.addLot({
-            symbol: $('lot-symbol').value,
-            side:   $('lot-side').value,
-            lots:   parseFloat($('lot-size').value),
+          await window.LotLegends.addTradeJournal({
+            symbol:  $('lot-symbol').value,
+            side:    $('lot-side').value,
+            lot_size: parseFloat($('lot-size').value),
+            pnl:     pnl,
+            note:    $('tj-note').value.trim() || null,
           });
           closeModal();
           $('lot-form').reset();
@@ -274,15 +297,17 @@
 
       async function loadAll() {
         try {
-          const [user, prog, lots, claims] = await Promise.all([
+          const [user, prog, jrows, jsum, claims] = await Promise.all([
             window.LotLegends.me(),
             window.LotLegends.progress(),
-            window.LotLegends.lots(8),
+            window.LotLegends.tradeJournal(20),
+            window.LotLegends.tradeJournalSummary(),
             window.LotLegends.claims(),
           ]);
           renderUser(user);
           renderProgress(prog);
-          renderActivity(lots);
+          renderJournalSummary(jsum);
+          renderActivity(jrows);
           renderRewards(prog, claims);
           loadLeaderboard(user);
         } catch (ex) {
@@ -343,24 +368,60 @@
         }
       }
 
+      function fmtPnl(n) {
+        if (n == null) return '—';
+        const v = Number(n);
+        if (v > 0) return '+' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      function pnlClass(n) {
+        if (n == null) return 'act__pnl--zero';
+        const v = Number(n);
+        if (v > 0) return 'act__pnl--pos';
+        if (v < 0) return 'act__pnl--neg';
+        return 'act__pnl--zero';
+      }
+
+      function renderJournalSummary(s) {
+        const el = $('journal-summary');
+        if (!s || s.total_orders === 0) {
+          el.textContent = 'ยังไม่มีรายการในสมุด — กด "บันทึกการเทรด" เพิ่มรายการแรก (ไม่กระทบ Lots รางวัล)';
+          el.hidden = false;
+          return;
+        }
+        const tp = s.total_pnl;
+        const sign = tp > 0 ? 'pnl-pos' : (tp < 0 ? 'pnl-neg' : '');
+        el.innerHTML = `
+          <span><strong>${s.total_orders.toLocaleString()}</strong> ออเดอร์</span>
+          <span>มี P/L: <strong>${s.orders_with_pnl.toLocaleString()}</strong> ออเดอร์</span>
+          <span>รวม P/L: <strong class="${sign}">${fmtPnl(s.total_pnl)}</strong></span>
+          <span>กำไร <strong class="pnl-pos">${s.wins}</strong> / ขาดทุน <strong class="pnl-neg">${s.losses}</strong></span>
+        `;
+        el.hidden = false;
+      }
+
       function renderActivity(rows) {
         const list = $('activity-list');
         if (!rows || rows.length === 0) {
           list.innerHTML = `<li class="muted small" style="text-align:center;padding:24px 0;">
-            ยังไม่มีรายการเทรด · กดปุ่ม "บันทึกการเทรด" เพื่อเพิ่มรายการแรก
+            ยังไม่มีรายการ · กด "บันทึกการเทรด" เพิ่มรายการแรก
           </li>`;
           return;
         }
-        list.innerHTML = rows.map(r => `
+        const side = (s) => s && s[0] ? s[0].toUpperCase() + s.slice(1).toLowerCase() : '—';
+        list.innerHTML = rows.map((r) => {
+          const vol = (r.lot_size != null) ? r.lot_size : r.lots; /* old API compat */
+          return `
           <li>
             <div class="act__date">${fmtDate(r.traded_at)}</div>
             <div class="act__body">
               <span class="act__sym">${r.symbol}</span>
-              <span class="act__type">${r.side[0].toUpperCase() + r.side.slice(1)}</span>
+              <span class="act__type">${side(r.side)}</span>
             </div>
-            <div class="act__lot">+ ${fmtLots(r.lots)} lots</div>
-          </li>
-        `).join('');
+            <div class="act__lot">${fmtLots(vol)} lot</div>
+            <div class="act__pnl ${pnlClass(r.pnl)}">${r.pnl != null ? ('P/L ' + fmtPnl(r.pnl)) : '—'}</div>
+          </li>`;
+        }).join('');
       }
 
       function renderRewards(p, claims) {

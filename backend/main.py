@@ -29,7 +29,7 @@ from .auth import (
 )
 from .csv_parser import ParseReport, parse_csv_bytes
 from .database import SessionLocal, get_db, init_db
-from .models import CsvImport, LotEntry, RewardClaim, User
+from .models import CsvImport, LotEntry, RewardClaim, TradeJournal, User
 
 log = logging.getLogger("lotlegends")
 logging.basicConfig(
@@ -337,7 +337,11 @@ def add_my_lot(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Manually add a lot entry (used for the Demo / Admin upload flow)."""
+    """Legacy: add a LotEntry (counts toward reward program).
+
+    Prefer /api/me/trade-journal for user-facing manual logs — that table does
+    not change reward Lot totals. Kept for API compatibility / admin tooling.
+    """
     entry = LotEntry(
         user_id=user.id,
         symbol=payload.symbol.upper(),
@@ -348,6 +352,101 @@ def add_my_lot(
     db.commit()
     db.refresh(entry)
     return entry
+
+
+# ─── Personal trade journal (stats only — not reward lots) ─────────
+@app.get("/api/me/trade-journal", response_model=list[schemas.TradeJournalOut])
+def list_trade_journal(
+    limit: int = 30,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return (
+        db.query(TradeJournal)
+        .filter(TradeJournal.user_id == user.id)
+        .order_by(desc(TradeJournal.traded_at), desc(TradeJournal.id))
+        .limit(min(limit, 200))
+        .all()
+    )
+
+
+@app.get("/api/me/trade-journal/summary", response_model=schemas.TradeJournalSummaryOut)
+def trade_journal_summary(
+    user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
+    uid = user.id
+    total_orders = int(db.query(func.count(TradeJournal.id)).filter(
+        TradeJournal.user_id == uid
+    ).scalar() or 0)
+    orders_with_pnl = int(
+        db.query(func.count(TradeJournal.id))
+        .filter(TradeJournal.user_id == uid, TradeJournal.pnl.isnot(None))
+        .scalar()
+        or 0
+    )
+    total_pnl = (
+        db.query(func.coalesce(func.sum(TradeJournal.pnl), 0.0))
+        .filter(TradeJournal.user_id == uid, TradeJournal.pnl.isnot(None))
+        .scalar()
+        or 0.0
+    )
+    wins = int(
+        db.query(func.count(TradeJournal.id))
+        .filter(TradeJournal.user_id == uid, TradeJournal.pnl > 0)
+        .scalar()
+        or 0
+    )
+    losses = int(
+        db.query(func.count(TradeJournal.id))
+        .filter(TradeJournal.user_id == uid, TradeJournal.pnl < 0)
+        .scalar()
+        or 0
+    )
+    be = int(
+        db.query(func.count(TradeJournal.id))
+        .filter(TradeJournal.user_id == uid, TradeJournal.pnl == 0)
+        .scalar()
+        or 0
+    )
+    return schemas.TradeJournalSummaryOut(
+        total_orders=total_orders,
+        orders_with_pnl=orders_with_pnl,
+        total_pnl=round(float(total_pnl), 2),
+        wins=wins,
+        losses=losses,
+        break_even=be,
+    )
+
+
+@app.post(
+    "/api/me/trade-journal",
+    response_model=schemas.TradeJournalOut,
+    status_code=201,
+)
+def add_trade_journal(
+    payload: schemas.TradeJournalIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    when = payload.traded_at
+    if when is None:
+        when = datetime.now(timezone.utc)
+    elif when.tzinfo is None:
+        when = when.replace(tzinfo=timezone.utc)
+
+    row = TradeJournal(
+        user_id=user.id,
+        symbol=payload.symbol.strip().upper(),
+        side=payload.side.lower(),
+        lot_size=payload.lot_size,
+        pnl=payload.pnl,
+        note=(payload.note or "").strip() or None,
+        traded_at=when,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
 
 
 # ─── Claims ────────────────────────────────────────────────────────

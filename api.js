@@ -83,6 +83,10 @@
     progress()               { return this.request('/me/progress'); },
     lots(limit = 20)         { return this.request(`/me/lots?limit=${limit}`); },
     addLot(payload)          { return this.request('/me/lots',  { method: 'POST', body: payload }); },
+    /** Personal trade log — does not add to reward program Lots. */
+    tradeJournal(limit = 30)   { return this.request(`/me/trade-journal?limit=${limit}`); },
+    tradeJournalSummary()    { return this.request('/me/trade-journal/summary'); },
+    addTradeJournal(payload) { return this.request('/me/trade-journal', { method: 'POST', body: payload }); },
     claims()                 { return this.request('/me/claims'); },
     claim(tier_key)          { return this.request('/me/claims', { method: 'POST', body: { tier_key } }); },
     leaderboard(limit = 10)  { return this.request(`/leaderboard?limit=${limit}`, { auth: false }); },

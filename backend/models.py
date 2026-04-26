@@ -29,6 +29,9 @@ class User(Base):
 
     lots: Mapped[list["LotEntry"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     claims: Mapped[list["RewardClaim"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    trade_journal: Mapped[list["TradeJournal"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class LotEntry(Base):
@@ -91,3 +94,21 @@ class RewardClaim(Base):
     claimed_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     user: Mapped[User] = relationship(back_populates="claims")
+
+
+class TradeJournal(Base):
+    """Personal trade log — for statistics only, does not affect reward Lots."""
+
+    __tablename__ = "trade_journal"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    symbol: Mapped[str] = mapped_column(String(20), nullable=False)
+    side: Mapped[str] = mapped_column(String(8), nullable=False)  # buy / sell
+    lot_size: Mapped[float] = mapped_column(Float, nullable=False)  # ขนาด lot ออเดอร์ (สถิติเท่านั้น)
+    pnl: Mapped[float | None] = mapped_column(Float, nullable=True)  # บวก=กำไร, ลบ=ขาดทุน
+    note: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    traded_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    user: Mapped[User] = relationship(back_populates="trade_journal")

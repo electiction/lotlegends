@@ -74,6 +74,38 @@ class LotOut(BaseModel):
     traded_at: datetime
 
 
+# ─── Personal trade journal (not reward Lots) ────────────────────
+class TradeJournalIn(BaseModel):
+    """Manual entry for self statistics — does not change program Lot totals."""
+    symbol: str = Field(..., min_length=2, max_length=20)
+    side: str = Field(..., pattern="^(buy|sell|Buy|Sell|BUY|SELL)$")
+    lot_size: float = Field(..., gt=0, le=1000, description="ออเดอร์ lot size — บันทึกสำหรับดูรวมเท่านั้น")
+    pnl: Optional[float] = Field(default=None, description="กำไร/ขาดทุน: บวกหรือลบได้")
+    note: Optional[str] = Field(default=None, max_length=200)
+    traded_at: Optional[datetime] = None
+
+
+class TradeJournalOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    symbol: str
+    side: str
+    lot_size: float
+    pnl: Optional[float] = None
+    note: Optional[str] = None
+    traded_at: datetime
+
+
+class TradeJournalSummaryOut(BaseModel):
+    total_orders: int
+    orders_with_pnl: int
+    total_pnl: float
+    wins: int
+    losses: int
+    break_even: int
+
+
 # ─── Tier / Progress ───────────────────────────────────────────────
 class TierInfo(BaseModel):
     rank: int
