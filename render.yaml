@@ -15,6 +15,8 @@
 databases:
   - name: lotlegends-db
     plan: free
+    region: singapore     # MUST match the web service region — Render's internal
+                          # hostname (dpg-xxx-a) only resolves within the same region.
     databaseName: lotlegends
     user: lotlegends
 
