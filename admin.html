@@ -186,6 +186,33 @@
           </div>
           <button type="button" class="btn btn--ghost btn--sm" id="refresh-history">รีเฟรช</button>
         </div>
+        <div class="stats" id="history-summary">
+          <div class="stat">
+            <p class="stat__label">รายการรวมทั้งหมด</p>
+            <p class="stat__value"><span id="hs-total-rows">0</span></p>
+            <p class="stat__sub">ทุกไฟล์ที่เคยนำเข้า</p>
+          </div>
+          <div class="stat">
+            <p class="stat__label">นำเข้ารวมทั้งหมด</p>
+            <p class="stat__value"><span id="hs-imported-rows">0</span></p>
+            <p class="stat__sub">รายการที่บันทึกเข้า DB แล้ว</p>
+          </div>
+          <div class="stat">
+            <p class="stat__label">ซ้ำรวมทั้งหมด</p>
+            <p class="stat__value"><span id="hs-duplicates">0</span></p>
+            <p class="stat__sub">รายการซ้ำที่ถูกข้าม</p>
+          </div>
+          <div class="stat">
+            <p class="stat__label">ไม่ตรงรวมทั้งหมด</p>
+            <p class="stat__value"><span id="hs-unmatched">0</span></p>
+            <p class="stat__sub">MT ID ที่ยังไม่ตรงสมาชิก</p>
+          </div>
+          <div class="stat">
+            <p class="stat__label">+Lots รวมทั้งหมด</p>
+            <p class="stat__value">+<span id="hs-total-lots">0</span></p>
+            <p class="stat__sub">Lots ที่เพิ่มสะสมทั้งหมด</p>
+          </div>
+        </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
@@ -456,10 +483,33 @@
       });
 
       // ─── History ───────────────────────────────────────────────
+      function renderHistorySummary(rows) {
+        const stats = {
+          total_rows: 0,
+          imported_rows: 0,
+          skipped_duplicates: 0,
+          unmatched_rows: 0,
+          total_lots_added: 0,
+        };
+        for (const r of rows) {
+          stats.total_rows += Number(r.total_rows || 0);
+          stats.imported_rows += Number(r.imported_rows || 0);
+          stats.skipped_duplicates += Number(r.skipped_duplicates || 0);
+          stats.unmatched_rows += Number(r.unmatched_rows || 0);
+          stats.total_lots_added += Number(r.total_lots_added || 0);
+        }
+        $('hs-total-rows').textContent = fmtInt(stats.total_rows);
+        $('hs-imported-rows').textContent = fmtInt(stats.imported_rows);
+        $('hs-duplicates').textContent = fmtInt(stats.skipped_duplicates);
+        $('hs-unmatched').textContent = fmtInt(stats.unmatched_rows);
+        $('hs-total-lots').textContent = fmt(stats.total_lots_added);
+      }
+
       async function loadHistory() {
         try {
           const rows = await window.LotLegends.adminImports();
           const tbody = $('history-rows');
+          renderHistorySummary(rows);
           if (!rows.length) {
             tbody.innerHTML = '<tr><td colspan="7" class="muted small" style="text-align:center;padding:24px 0;">ยังไม่มีการนำเข้า</td></tr>';
             return;
@@ -476,6 +526,7 @@
             </tr>
           `).join('');
         } catch {
+          renderHistorySummary([]);
           $('history-rows').innerHTML = '<tr><td colspan="7" class="muted small" style="text-align:center;padding:24px 0;">โหลดไม่สำเร็จ</td></tr>';
         }
       }
