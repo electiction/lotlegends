@@ -33,6 +33,18 @@ class ForgotPasswordOut(BaseModel):
     message: str = "หากอีเมลนี้มีในระบบ คุณจะได้รับลิงก์รีเซ็ตรหัสผ่านในไม่กี่นาที กรุณาตรวจสอบกล่อง junk / สแปมด้วย"
 
 
+class RequestResetByIdentityIn(BaseModel):
+    """MT ID on file must match; no email is sent. Weaker than inbox proof — use for convenience."""
+    email: EmailStr
+    xm_id: str = Field(..., min_length=1, max_length=40)
+
+
+class RequestResetByIdentityOut(BaseModel):
+    ok: bool = True
+    message: str = ""
+    token: Optional[str] = None
+
+
 class ResetPasswordIn(BaseModel):
     token: str = Field(..., min_length=20, max_length=90)
     new_password: str = Field(..., min_length=8, max_length=128)

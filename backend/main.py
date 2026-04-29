@@ -335,6 +335,38 @@ def forgot_password(
     return schemas.ForgotPasswordOut()
 
 
+@app.post("/api/auth/request-reset-by-identity", response_model=schemas.RequestResetByIdentityOut)
+def request_reset_by_identity(
+    payload: schemas.RequestResetByIdentityIn,
+    db: Session = Depends(get_db),
+):
+    """Issue a reset token if email + MT ID (XM) match a user — self-service without email delivery."""
+    email = (str(payload.email) or "").lower().strip()
+    xm_in = (payload.xm_id or "").strip()
+    if not email or not xm_in:
+        return schemas.RequestResetByIdentityOut(
+            message="กรุณากรอกอีเมลและ MT ID ให้ครบ",
+        )
+
+    user = db.query(User).filter(User.email == email).first()
+    uxm = (user.xm_id or "").strip() if user else ""
+    if not user or uxm != xm_in or not uxm:
+        return schemas.RequestResetByIdentityOut(
+            message="ไม่พบบัญชีที่อีเมลนี้ตรงกับ MT ID นี้ กรุณาตรวจสอบ หรือยังไม่ได้เชื่อม MT ID ในโปรไฟล์",
+        )
+
+    db.query(PasswordResetToken).filter(PasswordResetToken.user_id == user.id).delete()
+    token = secrets.token_urlsafe(32)
+    exp = datetime.now(timezone.utc) + timedelta(hours=1)
+    db.add(PasswordResetToken(user_id=user.id, token=token, expires_at=exp, used=False))
+    db.commit()
+
+    return schemas.RequestResetByIdentityOut(
+        message="ยืนยันตัวตนแล้ว กรุณาตั้งรหัสผ่านใหม่ด้านล่าง",
+        token=token,
+    )
+
+
 @app.post("/api/auth/reset-password", response_model=schemas.ForgotPasswordOut)
 def reset_password(
     payload: schemas.ResetPasswordIn,

@@ -1,0 +1,19 @@
+{
+  "name": "The Lot Legends",
+  "short_name": "LotLegends",
+  "id": "/",
+  "description": "Reward tracking web app for traders",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

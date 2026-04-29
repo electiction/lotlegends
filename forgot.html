@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="icon" href="app-icon.svg" type="image/svg+xml" />
   <title>ลืมรหัสผ่าน · The Lot Legends</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -29,10 +35,11 @@
         <p class="eyebrow">— Password</p>
         <h1 class="h2 auth__title">ลืม<br/><em>รหัสผ่าน</em></h1>
         <p class="muted auth__sub">
-          กรอกอีเมลที่ลงทะเบียน เราจะส่งลิงก์รีเซ็ตรหัส (อายุ 1 ชั่วโมง) ไปทางอีเมล
+          ส่งลิงก์ทางอีเมล หรือ ยืนยันด้วย <strong>อีเมล + MT ID</strong> แล้วตั้งรหัสเอง (ไม่ต้องรอเมล)
         </p>
 
         <form id="forgot-form" novalidate>
+          <p class="eyebrow small" style="margin-bottom:0.5rem">แบบที่ 1 — ส่งลิงก์</p>
           <div class="field">
             <label for="f-email">อีเมล</label>
             <input id="f-email" type="email" required autocomplete="email" placeholder="you@example.com" />
@@ -46,6 +53,40 @@
         <p class="auth__alt muted small" id="forgot-success" hidden>
           หากอีเมลนี้มีในระบบ คุณจะได้รับข้อความเร็วๆ นี้ — ตรวจกล่อง junk / สแปมด้วย
         </p>
+
+        <div class="auth__sep" style="margin:1.5rem 0; border-top:1px solid var(--line, #333)"></div>
+        <p class="eyebrow small" style="margin-bottom:0.5rem">แบบที่ 2 — ยืนยันด้วย MT ID</p>
+        <p class="muted small" style="margin-top:0">ต้องตรงกับ MT ID ที่บันทึกในโปรไฟล์</p>
+        <form id="forgot-identity-form" novalidate>
+          <div class="field">
+            <label for="f-id-email">อีเมล</label>
+            <input id="f-id-email" type="email" autocomplete="email" placeholder="you@example.com" />
+          </div>
+          <div class="field">
+            <label for="f-xm">MT ID (XM)</label>
+            <input id="f-xm" type="text" inputmode="text" autocomplete="username" placeholder="MT ID ที่เชื่อมกับบัญชี" />
+          </div>
+          <p class="form__error" id="forgot-id-error" hidden></p>
+          <p class="form__ok muted small" id="forgot-id-ok" hidden></p>
+          <div class="form__actions form__actions--single" id="forgot-id-step1">
+            <button type="submit" class="btn btn--ghost btn--lg" id="forgot-id-btn">ยืนยันตัวตน</button>
+          </div>
+        </form>
+        <form id="forgot-identity-newpw" novalidate hidden>
+          <div class="field">
+            <label for="f-newpw1">รหัสผ่านใหม่</label>
+            <input id="f-newpw1" type="password" minlength="8" autocomplete="new-password" />
+          </div>
+          <div class="field">
+            <label for="f-newpw2">ยืนยันรหัสผ่าน</label>
+            <input id="f-newpw2" type="password" minlength="8" autocomplete="new-password" />
+          </div>
+          <p class="form__error" id="forgot-pw-error" hidden></p>
+          <div class="form__actions form__actions--single">
+            <button type="submit" class="btn btn--gold btn--lg" id="forgot-pw-btn">บันทึกรหัสใหม่</button>
+          </div>
+        </form>
+
         <p class="auth__alt muted small"><a href="login.html">← กลับไปเข้าสู่ระบบ</a></p>
       </div>
     </div>
@@ -89,6 +130,90 @@
           err.hidden = false;
           btn.disabled = false;
           btn.textContent = 'ส่งลิงก์รีเซ็ต';
+        }
+      });
+
+      const idForm = document.getElementById('forgot-identity-form');
+      const idErr = document.getElementById('forgot-id-error');
+      const idOk = document.getElementById('forgot-id-ok');
+      const idEm = document.getElementById('f-id-email');
+      const idXm = document.getElementById('f-xm');
+      const idBtn = document.getElementById('forgot-id-btn');
+      const newPwForm = document.getElementById('forgot-identity-newpw');
+      const fNew1 = document.getElementById('f-newpw1');
+      const fNew2 = document.getElementById('f-newpw2');
+      const pwErr = document.getElementById('forgot-pw-error');
+      const pwBtn = document.getElementById('forgot-pw-btn');
+      let resetToken = null;
+
+      idForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        idErr.hidden = true;
+        idOk.hidden = true;
+        const email = idEm.value.trim();
+        const xm = idXm.value.trim();
+        if (!email || !xm) {
+          idErr.textContent = 'กรุณากรอกอีเมลและ MT ID';
+          idErr.hidden = false;
+          return;
+        }
+        idBtn.disabled = true;
+        idBtn.textContent = 'กำลังตรวจ…';
+        try {
+          const res = await window.LotLegends.requestResetByIdentity(email, xm);
+          if (res && res.token) {
+            resetToken = res.token;
+            idOk.textContent = res.message || 'ยืนยันแล้ว กรุณาตั้งรหัสด้านล่าง';
+            idOk.hidden = false;
+            document.getElementById('forgot-id-step1').hidden = true;
+            idEm.disabled = true;
+            idXm.disabled = true;
+            newPwForm.hidden = false;
+            fNew1.focus();
+          } else {
+            idErr.textContent = (res && res.message) || 'ยืนยันไม่สำเร็จ';
+            idErr.hidden = false;
+            idBtn.disabled = false;
+            idBtn.textContent = 'ยืนยันตัวตน';
+          }
+        } catch (ex) {
+          idErr.textContent = ex.message || 'ลองใหม่';
+          idErr.hidden = false;
+          idBtn.disabled = false;
+          idBtn.textContent = 'ยืนยันตัวตน';
+        }
+      });
+
+      newPwForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        pwErr.hidden = true;
+        const a = fNew1.value;
+        const b = fNew2.value;
+        if (a.length < 8) {
+          pwErr.textContent = 'รหัสต้องมีอย่างน้อย 8 ตัว';
+          pwErr.hidden = false;
+          return;
+        }
+        if (a !== b) {
+          pwErr.textContent = 'รหัสสองช่องไม่ตรงกัน';
+          pwErr.hidden = false;
+          return;
+        }
+        if (!resetToken) {
+          pwErr.textContent = 'เซสชันหมดอายุ กรุณายืนยันตัวตนอีกครั้ง';
+          pwErr.hidden = false;
+          return;
+        }
+        pwBtn.disabled = true;
+        pwBtn.textContent = 'กำลังบันทึก…';
+        try {
+          const res = await window.LotLegends.resetPassword(resetToken, a);
+          window.location.href = 'login.html?reset=1';
+        } catch (ex) {
+          pwErr.textContent = ex.message || 'บันทึกไม่สำเร็จ';
+          pwErr.hidden = false;
+          pwBtn.disabled = false;
+          pwBtn.textContent = 'บันทึกรหัสใหม่';
         }
       });
     })();

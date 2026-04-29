@@ -6,6 +6,48 @@
 (() => {
   const TOKEN_KEY = 'lotlegends_token';
 
+  function setupPwaUpdates() {
+    if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+
+    let refreshing = false;
+    const promptUpdate = (registration) => {
+      if (!registration || !registration.waiting) return;
+      const shouldUpdate = window.confirm('มีเวอร์ชันใหม่ของเว็บ พร้อมใช้งานแล้ว\nกด OK เพื่ออัปเดตทันที');
+      if (shouldUpdate) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    };
+
+    window.addEventListener('load', async () => {
+      try {
+        const registration = await navigator.serviceWorker.register('/sw.js');
+
+        if (registration.waiting) promptUpdate(registration);
+        registration.addEventListener('updatefound', () => {
+          const installing = registration.installing;
+          if (!installing) return;
+          installing.addEventListener('statechange', () => {
+            if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+              promptUpdate(registration);
+            }
+          });
+        });
+
+        // Check for updates periodically while tab is open.
+        setInterval(() => registration.update().catch(() => {}), 10 * 60 * 1000);
+      } catch {
+        // Keep UI silent if registration fails.
+      }
+    });
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+  }
+  setupPwaUpdates();
+
   const api = {
     base: (window.LOTLEGENDS_API || '') + '/api',
 
@@ -80,6 +122,9 @@
     previewClaim(mt_id)      { return this.request(`/auth/preview-claim/${encodeURIComponent(mt_id)}`, { auth: false }); },
     login(email, password)   { return this.request('/auth/login',    { method: 'POST', body: { email, password }, auth: false }); },
     forgotPassword(email)     { return this.request('/auth/forgot-password', { method: 'POST', body: { email }, auth: false }); },
+    requestResetByIdentity(email, xm_id) {
+      return this.request('/auth/request-reset-by-identity', { method: 'POST', body: { email, xm_id }, auth: false });
+    },
     resetPassword(token, new_password) {
       return this.request('/auth/reset-password', { method: 'POST', body: { token, new_password }, auth: false });
     },
