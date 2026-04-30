@@ -231,6 +231,7 @@ class AdminUserRow(BaseModel):
     display_handle: Optional[str] = None
     total_lots: float
     is_admin: bool
+    merge_message: Optional[str] = None
 
 
 class AdminUserUpdate(BaseModel):

@@ -637,6 +637,9 @@
             const idx = usersCache.findIndex(u => u.id === uid);
             if (idx >= 0) usersCache[idx] = updated;
             tr.outerHTML = renderUserRow(updated);
+            if (updated && updated.merge_message) {
+              alert(updated.merge_message);
+            }
           } catch (ex) {
             errBox.textContent = ex.message || 'บันทึกไม่สำเร็จ';
             errBox.hidden = false;

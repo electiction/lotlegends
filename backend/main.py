@@ -153,6 +153,29 @@ def _is_placeholder(user: User) -> bool:
     return bool(user.email and user.email.endswith(PLACEHOLDER_EMAIL_DOMAIN))
 
 
+def _merge_placeholder_into_user(
+    db: Session,
+    *,
+    placeholder: User,
+    target: User,
+) -> tuple[int, float]:
+    """Move all imported lots from a placeholder account into the real user."""
+    if placeholder.id == target.id:
+        return 0, 0.0
+
+    moved_rows = (
+        db.query(LotEntry)
+        .filter(LotEntry.user_id == placeholder.id)
+        .update({LotEntry.user_id: target.id}, synchronize_session=False)
+    )
+    moved_lots = db.query(func.coalesce(func.sum(LotEntry.lots), 0.0)).filter(
+        LotEntry.user_id == target.id
+    ).scalar() or 0.0
+
+    db.delete(placeholder)
+    return int(moved_rows or 0), float(moved_lots or 0.0)
+
+
 @app.get("/api/auth/preview-claim/{mt_id}", response_model=schemas.PreviewClaimOut)
 def preview_claim(mt_id: str, db: Session = Depends(get_db)):
     """Public lookup: does this MT ID have unclaimed Lots waiting?
@@ -906,6 +929,7 @@ def admin_update_user(
     target = db.query(User).filter(User.id == user_id).first()
     if not target:
         raise HTTPException(status_code=404, detail="ไม่พบสมาชิกนี้")
+    merge_message: Optional[str] = None
 
     if payload.xm_id is not None:
         new_xm = payload.xm_id.strip() or None
@@ -914,10 +938,23 @@ def admin_update_user(
                 User.xm_id == new_xm, User.id != target.id
             ).first()
             if clash:
-                raise HTTPException(
-                    status_code=409,
-                    detail=f"MT ID นี้ถูกใช้งานโดย {clash.name} ({clash.email})",
-                )
+                # Common rescue case: MT ID belongs to a placeholder created by CSV import.
+                # Allow admin to assign MT to the real member and merge lots automatically.
+                if _is_placeholder(clash):
+                    moved_rows, moved_total = _merge_placeholder_into_user(
+                        db,
+                        placeholder=clash,
+                        target=target,
+                    )
+                    merge_message = (
+                        f"ย้าย {moved_rows} รายการเทรดจาก placeholder เข้า {target.name} แล้ว "
+                        f"(Lots สะสมปัจจุบัน {round(moved_total, 2):.2f})"
+                    )
+                else:
+                    raise HTTPException(
+                        status_code=409,
+                        detail=f"MT ID นี้ถูกใช้งานโดย {clash.name} ({clash.email})",
+                    )
         target.xm_id = new_xm
 
     if payload.name is not None:
@@ -952,6 +989,7 @@ def admin_update_user(
         display_handle=target.display_handle,
         total_lots=round(float(total), 2),
         is_admin=bool(target.is_admin),
+        merge_message=merge_message,
     )
 
 
