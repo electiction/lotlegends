@@ -432,10 +432,10 @@
 
       function renderRewards(p, claims) {
         const TIERS = [
-          { key: 'gold',     name: 'Gold',     lots: 150,  reward: 'Apple Watch SE',     img: 'assets/tier-iphone.png' },
-          { key: 'platinum', name: 'Platinum', lots: 300,  reward: 'iPad (Gen 10)',      img: 'assets/tier-iphone.png' },
-          { key: 'diamond',  name: 'Diamond',  lots: 500,  reward: 'MacBook Air M3',     img: 'assets/tier-macbook.png' },
-          { key: 'master',   name: 'Master',   lots: 700,  reward: 'iPhone 17 Pro Max',  img: 'assets/tier-iphone.png' },
+          { key: 'gold',     name: 'Gold',     lots: 150,  reward: 'Apple Watch SE',     img: 'assets/tier-watch.png' },
+          { key: 'platinum', name: 'Platinum', lots: 300,  reward: 'iPad (Gen 10)',      img: 'assets/tier-ipad.png' },
+          { key: 'diamond',  name: 'Diamond',  lots: 500,  reward: 'MacBook Air M3',     img: 'assets/tier-macbook-new.png' },
+          { key: 'master',   name: 'Master',   lots: 700,  reward: 'iPhone 17 Pro Max',  img: 'assets/tier-iphone-new.png' },
           { key: 'legend',   name: 'Legend',   lots: 1000, reward: 'ทองคำ 1 บาท',         img: 'assets/tier-gold.png' },
         ];
         const claimedKeys = new Set((claims || []).map(c => c.tier));
