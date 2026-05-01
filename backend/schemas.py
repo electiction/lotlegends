@@ -4,7 +4,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+
+
+# Version string stored when a user accepts Terms + Privacy at registration (sync with static legal pages).
+LEGAL_DOCS_VERSION = "2026-05-01"
 
 
 # ─── Auth ──────────────────────────────────────────────────────────
@@ -17,6 +21,17 @@ class RegisterIn(BaseModel):
     xm_id: Optional[str] = Field(default=None, max_length=40)
     account_type: Optional[str] = Field(default=None, max_length=40)
     target_reward: Optional[str] = Field(default=None, max_length=40)
+    accept_terms: bool = Field(
+        ...,
+        description="Must be true — explicit acceptance of Terms and Privacy Policy.",
+    )
+
+    @field_validator("accept_terms")
+    @classmethod
+    def _accept_terms_must_be_true(cls, v: bool) -> bool:
+        if v is not True:
+            raise ValueError("ต้องยอมรับเงื่อนไขการให้บริการและนโยบายความเป็นส่วนตัว")
+        return v
 
 
 class LoginIn(BaseModel):

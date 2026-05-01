@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -52,7 +52,33 @@ def get_db():
         db.close()
 
 
+def _ensure_user_legal_columns() -> None:
+    """Add consent audit columns to existing deployments (SQLite + Postgres)."""
+    insp = inspect(engine)
+    if not insp.has_table("users"):
+        return
+    col_names = {c["name"] for c in insp.get_columns("users")}
+    dialect = engine.dialect.name
+
+    with engine.begin() as conn:
+        if "terms_privacy_accepted_at" not in col_names:
+            if dialect == "sqlite":
+                conn.execute(text("ALTER TABLE users ADD COLUMN terms_privacy_accepted_at DATETIME"))
+            else:
+                conn.execute(
+                    text("ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_privacy_accepted_at TIMESTAMP")
+                )
+        if "legal_documents_version" not in col_names:
+            if dialect == "sqlite":
+                conn.execute(text("ALTER TABLE users ADD COLUMN legal_documents_version VARCHAR(32)"))
+            else:
+                conn.execute(
+                    text("ALTER TABLE users ADD COLUMN IF NOT EXISTS legal_documents_version VARCHAR(32)")
+                )
+
+
 def init_db() -> None:
     """Create all tables. Imported here to avoid circular imports at module load."""
     from . import models  # noqa: F401  – ensures models register on Base
     Base.metadata.create_all(bind=engine)
+    _ensure_user_legal_columns()

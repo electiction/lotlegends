@@ -213,10 +213,16 @@ def preview_claim(mt_id: str, db: Session = Depends(get_db)):
     )
 
 
+def _utc_naive_now() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
 @app.post("/api/auth/register", response_model=schemas.TokenOut)
 def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
     new_email = payload.email.lower().strip()
     new_xm = (payload.xm_id or "").strip() or None
+    accepted_at = _utc_naive_now()
+    legal_ver = schemas.LEGAL_DOCS_VERSION
 
     # If an MT ID is provided AND a placeholder exists for it, claim that
     # placeholder instead of creating a brand-new user. This is how a customer
@@ -247,6 +253,8 @@ def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
         placeholder.account_type = payload.account_type or placeholder.account_type
         placeholder.target_reward = payload.target_reward
         placeholder.display_handle = _generate_handle(new_email)
+        placeholder.terms_privacy_accepted_at = accepted_at
+        placeholder.legal_documents_version = legal_ver
         db.commit()
         db.refresh(placeholder)
 
@@ -283,6 +291,8 @@ def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
         account_type=payload.account_type,
         target_reward=payload.target_reward,
         display_handle=handle,
+        terms_privacy_accepted_at=accepted_at,
+        legal_documents_version=legal_ver,
     )
     db.add(user)
     db.commit()

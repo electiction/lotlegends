@@ -89,8 +89,9 @@
         </ul>
 
         <p class="muted small join__legal">
-          การเข้าร่วมหมายถึงคุณยอมรับ <a href="#">เงื่อนไขการให้บริการ</a>
-          และ <a href="#">นโยบายความเป็นส่วนตัว</a> ของเรา
+          ดูรายละเอียดได้ที่ <a href="terms.html" target="_blank" rel="noopener noreferrer">เงื่อนไขการให้บริการ</a>
+          และ <a href="privacy.html" target="_blank" rel="noopener noreferrer">นโยบายความเป็นส่วนตัว</a>
+          — ขั้นตอนสมัครมีช่องยืนยันการอ่านและยอมรับก่อนส่งแบบฟอร์ม
         </p>
       </aside>
 
@@ -174,7 +175,7 @@
 
               <div class="field">
                 <label class="checkbox">
-                  <input type="checkbox" required/>
+                  <input id="f-partner" type="checkbox" required/>
                   <span>ฉันยืนยันว่าได้สมัครภายใต้ Partner Code <em>LOTLEGENDS</em></span>
                 </label>
               </div>
@@ -193,6 +194,19 @@
                 เกือบเสร็จแล้ว เลือกของรางวัลที่คุณสนใจมากที่สุด
                 เพื่อให้ทีมแนะนำคุณได้เหมาะสม
               </p>
+
+              <div class="field">
+                <label class="checkbox">
+                  <input id="f-legal" type="checkbox" required/>
+                  <span>
+                    ข้าพเจ้าได้อ่านและยอมรับ
+                    <a href="terms.html" target="_blank" rel="noopener noreferrer">เงื่อนไขการให้บริการ</a>
+                    และ
+                    <a href="privacy.html" target="_blank" rel="noopener noreferrer">นโยบายความเป็นส่วนตัว</a>
+                    รวมถึงการเก็บรวบรวมและใช้ข้อมูลส่วนบุคคลตามที่ระบุในนโยบาย
+                  </span>
+                </label>
+              </div>
 
               <div class="goal-grid">
                 <label class="goal">
@@ -277,7 +291,7 @@
 
   <footer class="footer">
     <div class="container footer__bottom">
-      <small>© 2026 The Lot Legends · Trading involves risk · Past performance does not guarantee future results</small>
+      <small>© 2026 The Lot Legends · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · Trading involves risk</small>
     </div>
   </footer>
 
@@ -355,6 +369,18 @@
         e.stopImmediatePropagation();
         errBox.hidden = true;
 
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const legalEl = document.getElementById('f-legal');
+        if (!legalEl || !legalEl.checked) {
+          errBox.textContent = 'กรุณาติ๊กยอมรับเงื่อนไขการให้บริการและนโยบายความเป็นส่วนตัว';
+          errBox.hidden = false;
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'ยืนยันเข้าร่วม';
+          }
+          return;
+        }
+
         const data = {
           name:          document.getElementById('f-name').value.trim(),
           email:         document.getElementById('f-email').value.trim(),
@@ -364,9 +390,9 @@
           xm_id:         document.getElementById('f-xmid').value.trim() || null,
           account_type:  document.getElementById('f-acc').value || null,
           target_reward: (document.querySelector('input[name="goal"]:checked') || {}).value || null,
+          accept_terms:  true,
         };
 
-        const submitBtn = form.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
         submitBtn.textContent = 'กำลังเปิดบัญชี…';
 

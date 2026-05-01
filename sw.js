@@ -1,9 +1,11 @@
-const CACHE_NAME = "lotlegends-v3";
+const CACHE_NAME = "lotlegends-v4";
 const CORE_ASSETS = [
   "/",
   "/index.html",
   "/login.html",
   "/join.html",
+  "/terms.html",
+  "/privacy.html",
   "/dashboard.html",
   "/forgot.html",
   "/reset-password.html",

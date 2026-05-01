@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="icon" href="app-icon.svg" type="image/svg+xml" />
+  <title>นโยบายความเป็นส่วนตัว · The Lot Legends</title>
+  <meta name="description" content="นโยบายการเก็บรวบรวมและใช้ข้อมูลส่วนบุคคล — The Lot Legends" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page--app">
+
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__mark">
+      <svg viewBox="0 0 60 60" width="56" height="56" aria-hidden="true">
+        <circle cx="30" cy="30" r="28" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+      </svg>
+      <span class="loader__letter">L</span>
+    </div>
+    <span class="loader__text">Privacy</span>
+  </div>
+
+  <header class="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="brand">
+        <span class="brand__mark">L</span>
+        <span class="brand__text">The Lot Legends</span>
+      </a>
+      <nav class="nav__links">
+        <a href="index.html#tiers">Rewards</a>
+        <a href="join.html">เข้าร่วม</a>
+        <a href="terms.html">เงื่อนไข</a>
+      </nav>
+      <a href="join.html" class="btn btn--ghost btn--nav">สมัคร</a>
+      <button class="nav__burger" id="nav-burger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <nav class="drawer__links">
+      <a href="index.html#tiers">Rewards</a>
+      <a href="join.html" class="drawer__cta">เข้าร่วมโปรแกรม</a>
+      <a href="terms.html">เงื่อนไขการให้บริการ</a>
+    </nav>
+    <p class="drawer__footer muted small">Quiet Luxury for Traders</p>
+  </div>
+
+  <section class="legal-doc">
+    <div class="container legal-doc__inner">
+      <p class="eyebrow">— Privacy</p>
+      <h1>นโยบายความเป็นส่วนตัว</h1>
+      <p class="legal-doc__meta">เวอร์ชันเอกสาร 1 พฤษภาคม 2026 · The Lot Legends</p>
+
+      <h2>ผู้ควบคุมข้อมูล</h2>
+      <p>
+        The Lot Legends เป็นผู้รับผิดชอบในการประมวลผลข้อมูลส่วนบุคคลภายใต้โปรแกรมและเว็บไซต์นี้
+        ช่องทางติดต่อหลักสำหรับคำขอเกี่ยวกับข้อมูลส่วนบุคคลระบุไว้ในส่วนท้ายของเอกสารฉบับนี้
+      </p>
+
+      <h2>ข้อมูลที่เราเก็บ</h2>
+      <p>ขึ้นอยู่กับการใช้งานของคุณ เราอาจเก็บข้อมูลดังต่อไปนี้:</p>
+      <ul>
+        <li>ข้อมูลบัญชีสมาชิก: ชื่อ อีเมล รหัสผ่าน (จัดเก็บในรูปแบบที่เข้ารหัสแล้ว) รหัส MT / ประเภทบัญชีที่คุณระบุ</li>
+        <li>ข้อมูลติดต่อเสริม: เบอร์โทรศัพท์ LINE ID หรือข้อมูลอื่นที่คุณกรอกโดยสมัครใจ</li>
+        <li>ข้อมูลการเข้าร่วมโปรแกรม: ปริมาณ Lots ประวัติการแลกรางวัล บันทึกที่เกี่ยวข้องกับโปรแกรม</li>
+        <li>ข้อมูลทางเทคนิค: บันทึกระบบที่จำเป็นเพื่อความปลอดภัย (เช่น เวลาเข้าใช้งาน ข้อผิดพลาดของระบบ) ตามความจำเป็นและสัดส่วน</li>
+      </ul>
+
+      <h2>วัตถุประสงค์และฐานทางกฎหมาย</h2>
+      <p>เราใช้ข้อมูลเพื่อวัตถุประสงค์ที่จำเป็นและสอดคล้องกับกฎหมาย รวมถึง:</p>
+      <ul>
+        <li>จัดตั้งและบริหารบัญชีสมาชิก รวมถึงการยืนยันตัวตนและการรีเซ็ตรหัสผ่าน</li>
+        <li>คำนวณและแสดงผลการสะสม Lots ระดับรางวัล และการจัดส่งของรางวัล</li>
+        <li>การสื่อสารเกี่ยวกับโปรแกรม การแจ้งเตือนที่สำคัญ และการตอบคำขอของคุณ</li>
+        <li>การปฏิบัติตามกฎหมาย การป้องกันทุจริต และการรักษาความปลอดภัยของระบบ</li>
+      </ul>
+      <p>
+        ในกรณีที่ต้องอาศัยความยินยอม (เช่น การส่งข่าวสารทางการตลาดเพิ่มเติมที่ไม่จำเป็นต่อการให้บริการหลัก)
+        เราจะขอความยินยอดแยกต่างหากตามความเหมาะสม
+      </p>
+
+      <h2>การเปิดเผยต่อบุคคลที่สาม</h2>
+      <p>
+        เราอาจส่งต่อข้อมูลให้ผู้ให้บริการโครงสร้างพื้นฐาน (เช่น โฮสติ้ง อีเมล) หรือพันธมิตรที่เกี่ยวข้องกับการนำเข้าข้อมูลการเทรด
+        เฉพาะเท่าที่จำเป็นต่อการดำเนินโปรแกรมและภายใต้ข้อตกลงรักษาความลับที่เหมาะสม
+      </p>
+
+      <h2>ระยะเวลาเก็บรักษา</h2>
+      <p>
+        เราเก็บข้อมูลตราบเท่าที่จำเป็นต่อการให้บริการและตามระยะเวลาที่กฎหมายกำหนด
+        เมื่อสิ้นสุดระยะเวลาดังกล่าว เราจะลบหรือทำให้ไม่สามารถระบุตัวบุคคลได้ตามมาตรการที่เหมาะสม
+      </p>
+
+      <h2>สิทธิของเจ้าของข้อมูล</h2>
+      <p>
+        ภายใต้กฎหมายคุ้มครองข้อมูลส่วนบุคคลที่ใช้บังคับ คุณอาจมีสิทธิ์ขอเข้าถึง แก้ไข ลบ ระงับ
+        คัดค้าน หรือถอนความยินยอม (หากการประมวลผลอิงความยินยอม) รวมถึงสิทธิ์อื่นตามที่กฎหมายกำหนด
+        การใช้สิทธิ์อาจต้องยืนยันตัวตนเพื่อความปลอดภัย
+      </p>
+
+      <h2>ความปลอดภัย</h2>
+      <p>
+        เราใช้มาตรการที่เหมาะสมทางเทคนิคและองค์กรเพื่อปกป้องข้อมูล
+        อย่างไรก็ตามการส่งข้อมูลผ่านอินเทอร์เน็ตไม่มีความปลอดภัยแบบสมบูรณ์ คุณควรเก็บรักษารหัสผ่านของตนเองอย่างระมัดระวัง
+      </p>
+
+      <h2>การโอนข้อมูลข้ามแดน</h2>
+      <p>
+        หากมีการใช้บริการคลาวด์ที่เซิร์ฟเวอร์อยู่นอกประเทศไทย เราจะพิจารณาให้มีมาตรการที่สอดคล้องกับข้อกำหนดของกฎหมายคุ้มครองข้อมูลส่วนบุคคล
+      </p>
+
+      <h2>การอัปเดตนโยบาย</h2>
+      <p>
+        เราอาจแก้ไขนโยบายนี้เป็นครั้งคราว โดยแสดงวันที่เวอร์ชันด้านบน
+        หากเป็นการเปลี่ยนแปลงที่สำคัญ เราจะแจ้งผ่านช่องทางที่เหมาะสม เช่น อีเมลหรือประกาศบนเว็บไซต์
+      </p>
+
+      <h2>ติดต่อ</h2>
+      <p>
+        หากมีคำถามเกี่ยวกับนโยบายนี้หรือต้องการใช้สิทธิ์ของเจ้าของข้อมูล
+        โปรดติดต่อทีมงานผ่านช่องทางที่ระบุบนเว็บไซต์หลัก (อีเมล / LINE Official ฯลฯ) เมื่อมีการประกาศใช้
+      </p>
+
+      <p class="legal-doc__note">
+        นโยบายนี้จัดทำเพื่ออธิบายแนวทางทั่วไป ไม่ใช่คำปรึกษาทางกฎหมายเฉพาะกรณี
+        หากธุรกิจของคุณมีความซับซ้อนด้านการคุ้มครองข้อมูลส่วนบุคคล แนะนำให้ปรึกษาที่ปรึกษากฎหมาย
+      </p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__bottom">
+      <small>© 2026 The Lot Legends · <a href="terms.html">เงื่อนไข</a> · <a href="join.html">เข้าร่วม</a></small>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -27,6 +27,10 @@ class User(Base):
     display_handle: Mapped[str | None] = mapped_column(String(40), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
+    # Record of explicit Terms + Privacy acceptance at signup (nullable for legacy rows).
+    terms_privacy_accepted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    legal_documents_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
     lots: Mapped[list["LotEntry"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     claims: Mapped[list["RewardClaim"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     trade_journal: Mapped[list["TradeJournal"]] = relationship(

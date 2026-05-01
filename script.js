@@ -170,7 +170,16 @@
         const current = steps[i];
         const required = current.querySelectorAll('[required]');
         let ok = true;
-        required.forEach(r => { if (!r.value.trim()) { r.classList.add('has-error'); ok = false; } else r.classList.remove('has-error'); });
+        required.forEach((r) => {
+          const missing =
+            r.type === 'checkbox' ? !r.checked : !String(r.value || '').trim();
+          if (missing) {
+            r.classList.add('has-error');
+            ok = false;
+          } else {
+            r.classList.remove('has-error');
+          }
+        });
         if (ok) show(i + 1);
       }
       if (back) show(i - 1);
