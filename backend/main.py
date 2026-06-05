@@ -17,6 +17,9 @@ from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile, 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
 
@@ -72,7 +75,10 @@ def next_tier(total_lots: float) -> Optional[dict]:
 
 
 # ─── App ───────────────────────────────────────────────────────────
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="The Lot Legends API", version="0.1.0")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 def _resolve_cors_origins() -> list[str]:
@@ -218,7 +224,8 @@ def _utc_naive_now() -> datetime:
 
 
 @app.post("/api/auth/register", response_model=schemas.TokenOut)
-def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def register(request: Request, payload: schemas.RegisterIn, db: Session = Depends(get_db)):
     new_email = payload.email.lower().strip()
     new_xm = (payload.xm_id or "").strip() or None
     accepted_at = _utc_naive_now()
@@ -301,7 +308,8 @@ def register(payload: schemas.RegisterIn, db: Session = Depends(get_db)):
 
 
 @app.post("/api/auth/login", response_model=schemas.TokenOut)
-def login(payload: schemas.LoginIn, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def login(request: Request, payload: schemas.LoginIn, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email.lower()).first()
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="อีเมลหรือรหัสผ่านไม่ถูกต้อง")
@@ -327,6 +335,7 @@ def _dt_aware_utc(d: datetime) -> datetime:
 
 
 @app.post("/api/auth/forgot-password", response_model=schemas.ForgotPasswordOut)
+@limiter.limit("5/minute")
 def forgot_password(
     payload: schemas.ForgotPasswordIn,
     request: Request,
